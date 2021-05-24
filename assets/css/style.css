@@ -522,6 +522,6 @@ li .post-meta-description { color: rgba(255, 255, 255, 0.69) !important; }
 
 .highlight .gd { color: #ff5555; }
 
-p code { font-size: 13px; }
+p code { font-size: 12px !important; }
 
 /*# sourceMappingURL=style.css.map */
