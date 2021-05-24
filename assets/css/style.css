@@ -381,7 +381,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .category-tags-link { color: #bb8181 !important; font-size: 13px !important; }
 
-.js-search-input .search-input { border: 0 !important; box-shadow: none !important; background-color: #131313 !important; padding: 15px !important; }
+.form-control { border: 0 !important; box-shadow: none !important; background-color: #131313 !important; padding: 15px !important; }
 
 .js-search-results { padding-top: 0.2rem; }
 
