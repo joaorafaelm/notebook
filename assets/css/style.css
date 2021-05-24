@@ -397,7 +397,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .search-results-list-item a:hover .search-result-title { text-decoration: underline; }
 
-.search-result-rel-date { color: #909090; font-size: 13px; }
+.search-result-rel-date { color: #909090; font-size: 12px; }
 
 .search-result-preview { color: #777; font-size: 14px; margin-top: .02rem !important; margin-bottom: .02rem !important; }
 
@@ -429,7 +429,7 @@ pre code { font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace 
 /*----- ADD YOUR STYLES BELOW -------*/
 html, body, input, textarea, select, button { color: rgba(255, 255, 255, 0.87) !important; background-color: #181818 !important; }
 
-a { color: #4bbaff !important; }
+a { color: #4bbaff !important; text-underline-offset: 5px !important; }
 
 a:hover { color: rgba(255, 255, 255, 0.87) !important; }
 
