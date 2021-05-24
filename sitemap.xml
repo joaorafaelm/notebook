@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://joaorafaelm.github.io/notebooks/markdown/2020/01/14/test-markdown-post.html</loc>
+<loc>https://joaorafaelm.github.io/notebook/markdown/2020/01/14/test-markdown-post.html</loc>
 <lastmod>2020-01-14T00:00:00-06:00</lastmod>
 </url>
 <url>
-<loc>https://joaorafaelm.github.io/notebooks/jupyter/2020/02/20/test.html</loc>
+<loc>https://joaorafaelm.github.io/notebook/jupyter/2020/02/20/test.html</loc>
 <lastmod>2020-02-20T00:00:00-06:00</lastmod>
 </url>
 <url>
-<loc>https://joaorafaelm.github.io/notebooks/about/</loc>
+<loc>https://joaorafaelm.github.io/notebook/about/</loc>
 </url>
 <url>
-<loc>https://joaorafaelm.github.io/notebooks/</loc>
+<loc>https://joaorafaelm.github.io/notebook/</loc>
 </url>
 <url>
-<loc>https://joaorafaelm.github.io/notebooks/search/</loc>
+<loc>https://joaorafaelm.github.io/notebook/search/</loc>
 </url>
 <url>
-<loc>https://joaorafaelm.github.io/notebooks/categories/</loc>
+<loc>https://joaorafaelm.github.io/notebook/categories/</loc>
 </url>
 </urlset>

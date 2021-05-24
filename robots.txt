@@ -1,1 +1,1 @@
-Sitemap: https://joaorafaelm.github.io/notebooks/sitemap.xml
+Sitemap: https://joaorafaelm.github.io/notebook/sitemap.xml
