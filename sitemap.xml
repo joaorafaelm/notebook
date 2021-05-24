@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html</loc>
+<lastmod>2017-08-05T00:00:00-05:00</lastmod>
+</url>
+<url>
+<loc>https://joaorafaelm.github.io/notebook/nlp/2017/08/24/text-classification-with-python.html</loc>
+<lastmod>2017-08-24T00:00:00-05:00</lastmod>
+</url>
+<url>
 <loc>https://joaorafaelm.github.io/notebook/django/nlp/2021/05/23/Testing_Notebook.html</loc>
 <lastmod>2021-05-23T00:00:00-05:00</lastmod>
 </url>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>GraphQL and Django in 5 minutes | notebooks</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="GraphQL and Django in 5 minutes" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="TL;DR Jump to the coding part or get the code here." />
+<meta property="og:description" content="TL;DR Jump to the coding part or get the code here." />
+<link rel="canonical" href="https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html" />
+<meta property="og:url" content="https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html" />
+<meta property="og:site_name" content="notebooks" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2017-08-05T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html","@type":"BlogPosting","headline":"GraphQL and Django in 5 minutes","dateModified":"2017-08-05T00:00:00-05:00","datePublished":"2017-08-05T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html"},"description":"TL;DR Jump to the coding part or get the code here.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/notebook/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://joaorafaelm.github.io/notebook/feed.xml" title="notebooks" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-104187041-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-104187041-1');
+</script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/notebook/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/notebook/">notebooks</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/notebook/about/">About Me</a><a class="page-link" href="/notebook/search/">Search</a><a class="page-link" href="/notebook/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">GraphQL and Django in 5 minutes</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2017-08-05T00:00:00-05:00" itemprop="datePublished">
+        Aug 5, 2017
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/notebook/categories/#graphql">graphql</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/notebook/categories/#django">django</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <blockquote>
+  <p><strong>TL;DR</strong> Jump to the <a href="#models-and-graphql-schema">coding part</a> or get the code <a href="https://github.com/joaorafaelm/graphql-django-example">here</a>.</p>
+</blockquote>
+
+<h1 id="what-is-graphql">What is GraphQL?</h1>
+<p>GraphQL query is a string that is sent to a server to be interpreted and fulfilled, which then returns JSON back to the client.
+It was created by Facebook in 2012 and the first <a href="http://facebook.github.io/graphql/">specification draft</a> was made public in 2015.</p>
+
+<p>In this tutorial I will cover the basics of working with GraphQL and Django.</p>
+
+<h1 id="getting-started">Getting started</h1>
+<p>Before creating the project and all, make sure you have <a href="https://virtualenv.pypa.io/en/stable/">virtualenv</a> installed, so that the packages used in this tutorial won’t be installed system-wide.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Clone the repo</span>
+git clone https://github.com/joaorafaelm/graphql-django-example<span class="p">;</span>
+<span class="nb">cd </span>graphql-django-example<span class="p">;</span>
+
+<span class="c"># Create virtualenv</span>
+virtualenv venv <span class="o">&amp;&amp;</span> <span class="nb">source </span>venv/bin/activate<span class="p">;</span>
+
+<span class="c"># Install django and graphene</span>
+pip <span class="nb">install</span> <span class="nt">-r</span> requirements.txt<span class="p">;</span>
+
+<span class="c"># Setup db</span>
+python manage.py migrate<span class="p">;</span>
+</code></pre></div></div>
+
+<p>Run <code class="language-plaintext highlighter-rouge">python manage.py loaddata books.json</code> to populate the db, or run <code class="language-plaintext highlighter-rouge">python manage.py createsuperuser</code> and then add some data using the admin interface.</p>
+
+<h1 id="models-and-graphql-schema">Models and GraphQL Schema</h1>
+<p>This example is going to use the models Author, Book and Publisher.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># bookstore/store/models.py
+</span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">Publisher</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">website</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">URLField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">name</span>
+
+<span class="k">class</span> <span class="nc">Author</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">EmailField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">'%s %s'</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">first_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">last_name</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">Book</span><span class="p">(</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Author</span><span class="p">)</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Publisher</span><span class="p">)</span>
+    <span class="n">publication_date</span> <span class="o">=</span> <span class="n">models</span><span class="p">.</span><span class="n">DateField</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">title</span>
+</code></pre></div></div>
+
+<p>After creating the models, the <a href="http://graphql.org/learn/schema/#type-language">Schema</a> should be created, which will be used to serve the API.</p>
+
+<p>At the time of writing this post, <a href="https://github.com/graphql-python/graphene-django">graphene-django</a> version is 1.3 and it does not handle ManyToMany fields properly, that is why the <code class="language-plaintext highlighter-rouge">resolve_authors</code> method was added. This issue has been <a href="https://github.com/graphql-python/graphene-django/issues/155">resolved</a> for the next release.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># bookstore/schema.py
+</span><span class="kn">import</span> <span class="nn">graphene</span>
+<span class="kn">from</span> <span class="nn">graphene_django.types</span> <span class="kn">import</span> <span class="n">DjangoObjectType</span>
+<span class="kn">from</span> <span class="nn">graphene_django.debug</span> <span class="kn">import</span> <span class="n">DjangoDebug</span>
+<span class="kn">from</span> <span class="nn">bookstore.store.models</span> <span class="kn">import</span> <span class="n">Author</span><span class="p">,</span> <span class="n">Book</span><span class="p">,</span> <span class="n">Publisher</span>
+
+<span class="k">class</span> <span class="nc">AuthorType</span><span class="p">(</span><span class="n">DjangoObjectType</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Author</span>
+
+<span class="k">class</span> <span class="nc">BookType</span><span class="p">(</span><span class="n">DjangoObjectType</span><span class="p">):</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">graphene</span><span class="p">.</span><span class="n">List</span><span class="p">(</span><span class="n">AuthorType</span><span class="p">)</span>
+
+    <span class="c1"># Many To Many fix until next release.
+</span>    <span class="c1"># https://github.com/graphql-python/graphene-django/issues/155
+</span>    <span class="o">@</span><span class="n">graphene</span><span class="p">.</span><span class="n">resolve_only_args</span>
+    <span class="k">def</span> <span class="nf">resolve_authors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">authors</span><span class="p">.</span><span class="nb">all</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Book</span>
+
+<span class="k">class</span> <span class="nc">PublisherType</span><span class="p">(</span><span class="n">DjangoObjectType</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Publisher</span>
+
+<span class="k">class</span> <span class="nc">Query</span><span class="p">(</span><span class="n">graphene</span><span class="p">.</span><span class="n">ObjectType</span><span class="p">):</span>
+    <span class="n">all_authors</span> <span class="o">=</span> <span class="n">graphene</span><span class="p">.</span><span class="n">List</span><span class="p">(</span><span class="n">AuthorType</span><span class="p">)</span>
+    <span class="n">all_books</span> <span class="o">=</span> <span class="n">graphene</span><span class="p">.</span><span class="n">List</span><span class="p">(</span><span class="n">BookType</span><span class="p">)</span>
+    <span class="n">all_publishers</span> <span class="o">=</span> <span class="n">graphene</span><span class="p">.</span><span class="n">List</span><span class="p">(</span><span class="n">PublisherType</span><span class="p">)</span>
+
+    <span class="c1"># Debug field (rawSql, parameters etc).
+</span>    <span class="n">debug</span> <span class="o">=</span> <span class="n">graphene</span><span class="p">.</span><span class="n">Field</span><span class="p">(</span><span class="n">DjangoDebug</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'__debug'</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">resolve_all_authors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Author</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nb">all</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">resolve_all_books</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Book</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="n">select_related</span><span class="p">(</span><span class="s">'publisher'</span><span class="p">).</span><span class="nb">all</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">resolve_all_publishers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Publisher</span><span class="p">.</span><span class="n">objects</span><span class="p">.</span><span class="nb">all</span><span class="p">()</span>
+
+<span class="n">schema</span> <span class="o">=</span> <span class="n">graphene</span><span class="p">.</span><span class="n">Schema</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">Query</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Last but not least, the GraphQL URL must be added into the urls.py file.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># bookstore/urls.py
+</span><span class="kn">from</span> <span class="nn">django.conf.urls</span> <span class="kn">import</span> <span class="n">url</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span> <span class="nn">graphene_django.views</span> <span class="kn">import</span> <span class="n">GraphQLView</span>
+<span class="kn">from</span> <span class="nn">bookstore.schema</span> <span class="kn">import</span> <span class="n">schema</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r'^admin/'</span><span class="p">,</span> <span class="n">admin</span><span class="p">.</span><span class="n">site</span><span class="p">.</span><span class="n">urls</span><span class="p">),</span>
+    <span class="n">url</span><span class="p">(</span><span class="s">r'^graphql'</span><span class="p">,</span> <span class="n">GraphQLView</span><span class="p">.</span><span class="n">as_view</span><span class="p">(</span><span class="n">graphiql</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">)),</span>
+<span class="p">]</span>
+</code></pre></div></div>
+<p>You can now run <code class="language-plaintext highlighter-rouge">python manage.py runserver</code> and start using the API at <a href="http://localhost:8000/graphql">http://localhost:8000/graphql</a>.</p>
+
+<h1 id="querying-and-debugging">Querying and debugging</h1>
+<p><a href="https://github.com/graphql/graphiql">GraphiQL</a> provides a graphical interactive in-browser GraphQL IDE, including some features such as syntax highlighting, real-time error reporting, automatic query completion etc.</p>
+
+<p>I will show some query examples, but you can learn more about querying at <a href="http://graphql.org/learn/queries/">graphql.org/learn/queries/</a>.</p>
+
+<hr />
+
+<p>Given the following query, we can retrieve all books registered along with their authors.</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nx">allBooks</span> <span class="p">{</span>
+    <span class="nx">title</span><span class="p">,</span>
+    <span class="nx">authors</span> <span class="p">{</span>
+      <span class="nx">firstName</span><span class="p">,</span>
+      <span class="nx">lastName</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>And the response…</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"allBooks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Resurrection"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"authors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Leo"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tolstoy"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">]</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Childhood"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"authors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"firstName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Leo"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tolstoy"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">]</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+<p>Using the <code class="language-plaintext highlighter-rouge">__debug</code> field you can get information about the actual SQL query.</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="nx">allAuthors</span> <span class="p">{</span><span class="nx">lastName</span><span class="p">}</span>
+  <span class="nx">__debug</span> <span class="p">{</span>
+    <span class="nx">sql</span> <span class="p">{</span><span class="nx">rawSql</span><span class="p">,</span> <span class="nx">duration</span><span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Response:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"allAuthors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"King"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Tolstoy"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Gaiman"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"lastName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Pratchett"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"__debug"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"sql"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"rawSql"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SELECT </span><span class="se">\"</span><span class="s2">store_author</span><span class="se">\"</span><span class="s2">.</span><span class="se">\"</span><span class="s2">id</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">store_author</span><span class="se">\"</span><span class="s2">.</span><span class="se">\"</span><span class="s2">first_name</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">store_author</span><span class="se">\"</span><span class="s2">.</span><span class="se">\"</span><span class="s2">last_name</span><span class="se">\"</span><span class="s2">, </span><span class="se">\"</span><span class="s2">store_author</span><span class="se">\"</span><span class="s2">.</span><span class="se">\"</span><span class="s2">email</span><span class="se">\"</span><span class="s2"> FROM </span><span class="se">\"</span><span class="s2">store_author</span><span class="se">\"</span><span class="s2">"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"duration"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0009260177612304688</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<hr />
+
+<p>All this code is on my <a href="https://github.com/joaorafaelm/graphql-django-example/">Github</a>. Please do fork it and make pull requests regarding any issues or improvements you may have with my code.</p>
+
+  </div><a class="u-url" href="/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/notebook/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/notebook/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/notebook/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/joaorafaelm" title="joaorafaelm"><svg class="svg-icon grey"><use xlink:href="/notebook/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
