@@ -113,9 +113,6 @@ kramdown:
   auto_ids: true
   hard_wrap: false
   syntax_highlighter: rouge
-  syntax_highlighter_opts:
-    block:
-    line_numbers: true
 
 # to limit size of xml as it can grow quite large.
 feed:
