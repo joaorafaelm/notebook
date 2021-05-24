@@ -90,3 +90,19 @@ canvas {
 li .post-meta-description {
     color: $med-emph !important;
 }
+
+.site-footer {
+    border-top: 0 !important;
+}
+
+.footer-col-wrapper {
+    display: none !important;
+}
+
+.social-media-list li a, .pagination li a {
+    border: 0 !important;
+}
+
+.site-header{
+    border: 0 !important;
+}
