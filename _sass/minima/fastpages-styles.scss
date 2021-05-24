@@ -168,14 +168,21 @@ h6:hover .anchor-link {
 }
 
 // Search Page Styles
+.js-search-input .search-input{
+    border: 0;
+    box-shadow: none;
+    background-color: rgb(19, 19, 19) !important;
+    padding: 15px;
+}
+
 .js-search-results {padding-top: 0.2rem;}
 .search-results-list-item {padding-bottom: 1rem;}
 .search-results-list-item .search-result-title {
   font-size: 14px;
-  color: #d9230f;
+  color: #909090;
 }
 .search-result-rel-url {color: silver;}
-.search-results-list-item a {display: block; color: #777;}
+.search-results-list-item a {display: block; color: white;}
 .search-results-list-item a:hover, .search-results-list-item a:focus {text-decoration: none;}
 .search-results-list-item a:hover .search-result-title {text-decoration: underline;}
 
