@@ -483,7 +483,7 @@ li .post-meta-description { color: rgba(255, 255, 255, 0.69) !important; }
 
 .input_area pre { border-left: 1px solid lightcoral; }
 
-.output_area pre { border-left: 1px solid grey; margin-left: 1rem !important; font-size: 16px; }
+.output_area pre { border-left: 1px solid grey; font-size: 12px; }
 
 .code_cell table { width: auto; }
 
