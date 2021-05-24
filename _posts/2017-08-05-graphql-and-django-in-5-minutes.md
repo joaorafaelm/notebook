@@ -134,8 +134,6 @@ You can now run `python manage.py runserver` and start using the API at [http://
 
 I will show some query examples, but you can learn more about querying at [graphql.org/learn/queries/](http://graphql.org/learn/queries/).
 
----
-
 Given the following query, we can retrieve all books registered along with their authors.
 ```javascript
 {
@@ -176,7 +174,6 @@ And the response...
 }
 ```
 
----
 Using the `__debug` field you can get information about the actual SQL query.
 ```javascript
 {
