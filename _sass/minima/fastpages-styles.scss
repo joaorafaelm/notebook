@@ -28,7 +28,8 @@ img.emoji{
 
 // make non-headings slightly lighter
 .post-content p, .post-content li {
-   color: #515151;
+    font-size: 14px;
+    color: #515151;
 }
 
 .post-link{
@@ -252,5 +253,6 @@ table {
 }
 
 pre code {
-  font-size: 14px !important;
+    font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace !important;
+    font-size: 12px !important;
 }
