@@ -2,6 +2,8 @@
 layout: post
 title: GraphQL and Django in 5 minutes
 categories: [graphql, django]
+comments: true
+toc: true
 ---
 
 > **TL;DR** Jump to the [coding part](#models-and-graphql-schema) or get the code [here](https://github.com/joaorafaelm/graphql-django-example).
