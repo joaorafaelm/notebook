@@ -437,7 +437,7 @@ a:hover { color: rgba(255, 255, 255, 0.87) !important; }
 
 * { scrollbar-color: #181818 #383838; }
 
-pre, code { border-color: #383838; background-color: #242424; }
+pre, code { border-color: transparent; background-color: #242424; }
 
 .page-description { color: rgba(255, 255, 255, 0.69); }
 
