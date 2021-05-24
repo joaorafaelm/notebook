@@ -108,17 +108,28 @@ window.onload = wrap_img;
     </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <blockquote>
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#what-is-text-classification">What is Text Classification?</a></li>
+<li class="toc-entry toc-h1"><a href="#getting-started">Getting started</a></li>
+<li class="toc-entry toc-h1"><a href="#setting-up-the-environment">Setting up the environment</a></li>
+<li class="toc-entry toc-h1"><a href="#gathering-the-data">Gathering the data</a></li>
+<li class="toc-entry toc-h1"><a href="#extracting-features-from-the-dataset">Extracting features from the dataset</a></li>
+<li class="toc-entry toc-h1"><a href="#testing-the-algorithms">Testing the algorithms</a></li>
+<li class="toc-entry toc-h1"><a href="#conclusion">Conclusion</a></li>
+<li class="toc-entry toc-h1"><a href="#further-reading">Further reading</a></li>
+</ul><blockquote>
   <p>If you are already familiar with what text classification is, you might want to jump to <a href="#testing-the-algorithms">this part</a>, or get the code <a href="https://github.com/joaorafaelm/text-classification-python">here</a>.</p>
 </blockquote>
 
-<h1 id="what-is-text-classification">What is Text Classification?</h1>
+<h1 id="what-is-text-classification">
+<a class="anchor" href="#what-is-text-classification" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is Text Classification?</h1>
 <p>Document or text classification is used to classify information, that is, assign a category to a text; it can be a document, a tweet, a simple message, an email, and so on.
 In this article, I will show how you can classify retail products into categories. Although in this example the categories are structured in a hierarchy, to keep it simple I will consider all subcategories as top-level.</p>
 
 <p><em>If you are looking for complex implementations of large scale hierarchical text classification, I will leave links to some really good papers and projects at the <a href="#conclusion">end</a> of this post.</em></p>
 
-<h1 id="getting-started">Getting started</h1>
+<h1 id="getting-started">
+<a class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started</h1>
 <p>Now, before you go any further, make sure you have installed <a href="https://www.python.org/downloads/">Python3+</a> and <a href="https://virtualenv.pypa.io/en/stable/">virtualenv</a> <em>(optional, but I highly recommend you to use it)</em>.</p>
 
 <p>Let’s break down the problem into steps:</p>
@@ -129,7 +140,8 @@ In this article, I will show how you can classify retail products into categorie
   <li><a href="#testing-the-algorithms">Testing the algorithms</a></li>
 </ul>
 
-<h1 id="setting-up-the-environment">Setting up the environment</h1>
+<h1 id="setting-up-the-environment">
+<a class="anchor" href="#setting-up-the-environment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting up the environment</h1>
 <p>The main packages used in this projects are: <a href="http://scikit-learn.org">sklearn</a>, <a href="http://www.nltk.org">nltk</a> and <a href="https://dataset.readthedocs.io/en/latest/">dataset</a>.
 Due to the size of the data-set, it might take some time to clone/download the repository; NLTK data is also considerably big.
 Run the following commands to setup the project structure and download the required packages:</p>
@@ -147,7 +159,8 @@ pip <span class="nb">install</span> <span class="nt">-r</span> requirements.txt<
 python <span class="nt">-m</span> nltk.downloader all<span class="p">;</span>
 </code></pre></div></div>
 
-<h1 id="gathering-the-data">Gathering the data</h1>
+<h1 id="gathering-the-data">
+<a class="anchor" href="#gathering-the-data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Gathering the data</h1>
 <p>The dataset that will be used was created by <a href="https://en.wikipedia.org/wiki/Web_scraping">scraping</a> some products from Amazon. Scraping might be fine for projects where only a small amount of data is required, but it can be a really slow process since it is very simple for a server to detect a robot, unless you are rotating over a list of proxies, which can slow the process even more.</p>
 
 <p>Using <a href="https://github.com/joaorafaelm/text-classification-python/blob/master/amazon_scrape.py">this script</a>, I downloaded information of over 22,000 products, organized into 42 top-level categories, and a total of 6233 subcategories. See the whole category tree structure <a href="https://github.com/joaorafaelm/text-classification-python/blob/master/category_tree.txt">here</a>.</p>
@@ -166,10 +179,11 @@ To transform the data dumped from the database into this “filtered” data, ju
 </code></pre></div></div>
 <p>The script will create a new file called <strong>products.json</strong> at the root of the project, and print out the category tree structure. Change the value of the variables <code class="language-plaintext highlighter-rouge">default_depth</code>, <code class="language-plaintext highlighter-rouge">min_samples</code> and <code class="language-plaintext highlighter-rouge">domain</code> if you need more data.</p>
 
-<h1 id="extracting-features-from-the-dataset">Extracting features from the dataset</h1>
+<h1 id="extracting-features-from-the-dataset">
+<a class="anchor" href="#extracting-features-from-the-dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extracting features from the dataset</h1>
 <p>In order to run machine learning algorithms, we need to transform the text into numerical vectors. <a href="https://en.wikipedia.org/wiki/Bag-of-words_model">Bag-of-words</a> is one of the most used models, it assigns a numerical value to a word, creating a list of numbers. It can also assign a value to a set of words, known as <a href="https://en.wikipedia.org/wiki/N-gram">N-gram</a>.</p>
 
-<p>Scikit provides a vectorizer called <a href="http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">TfidfVectorizer</a> which transforms the text based on the bag-of-words/n-gram model, additionally, it computes term frequencies and evaluate each word using the <a href="https://en.wikipedia.org/wiki/Tf–idf">tf-idf</a> weighting scheme.</p>
+<p>Scikit provides a vectorizer called <a href="http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">TfidfVectorizer</a> which transforms the text based on the bag-of-words/n-gram model, additionally, it computes term frequencies and evaluate each word using the <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">tf-idf</a> weighting scheme.</p>
 
 <p>Counting terms frequencies might not be enough sometimes. Take the words ‘cars’ and ‘car’ for example, by only using <em>tf-idf</em>, they are considered different words. This problem can be solved using <a href="https://en.wikipedia.org/wiki/Stemming">Stemming</a> and/or <a href="https://en.wikipedia.org/wiki/Lemmatisation">Lemmatisation</a>. And there is where <a href="http://www.nltk.org">NLTK</a> comes into play.</p>
 
@@ -179,7 +193,8 @@ To transform the data dumped from the database into this “filtered” data, ju
 
 <p>It is also worth noting that some words despite the fact that they appear frequently, they do not really make any difference for classification, in fact they could even help misclassify a text. Words like ‘a’, ‘an’, ‘the’, ‘to’, ‘or’ etc, are known as <a href="https://en.wikipedia.org/wiki/Stop_words">stop-words</a>. These words can be ignored during the <a href="https://nlp.stanford.edu/IR-book/html/htmledition/tokenization-1.html">tokenization</a> process.</p>
 
-<h1 id="testing-the-algorithms">Testing the algorithms</h1>
+<h1 id="testing-the-algorithms">
+<a class="anchor" href="#testing-the-algorithms" aria-hidden="true"><span class="octicon octicon-link"></span></a>Testing the algorithms</h1>
 <p>Now that we have all the features and labels, it is time to train the classifiers. There are a number of algorithms you can use for this type of problem, for example: Multinomial Naive Bayes, Linear SVC, SGD Classifier, K-Neighbors Classifier, Random Forest Classifier.
 Inside the file <a href="https://github.com/joaorafaelm/text-classification-python/blob/master/classify.py">classify.py</a> you can find an example using the SGDClassifier.
 Run it yourself using the command:</p>
@@ -288,13 +303,15 @@ The classifier is trained and tested using <a href="http://statweb.stanford.edu/
 
 <p>The <em>recall</em> is the percentage of all the test samples that originally belonged to the category and in the evaluation process were correctly classified to the category.</p>
 
-<h1 id="conclusion">Conclusion</h1>
+<h1 id="conclusion">
+<a class="anchor" href="#conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusion</h1>
 <p>As the category tree gets bigger, and you have more and more data to classify, you cannot use a model as simple as the one above (well, you can but its precision will be very low, not to mention the computational cost). Another important thing to notice, is how you structure the categories, in amazon category structure, a lot of subcategories are so confused that I doubt even humans could correctly classify products to them.
 The full code of this post can be found <a href="https://github.com/joaorafaelm/text-classification-python">here</a>.</p>
 
 <p>If you noticed something wrong, or you know something that can make the algorithms better, please do comment bellow. Thanks for reading!</p>
 
-<h1 id="further-reading">Further reading</h1>
+<h1 id="further-reading">
+<a class="anchor" href="#further-reading" aria-hidden="true"><span class="octicon octicon-link"></span></a>Further reading</h1>
 <ul>
   <li>
     <p><a href="https://monkeylearn.com/docs/article/classifier-statistics/">Classifier Statistics</a></p>
@@ -322,7 +339,16 @@ The full code of this post can be found <a href="https://github.com/joaorafaelm/
   </li>
 </ul>
 
-  </div><a class="u-url" href="/notebook/nlp/2017/08/24/text-classification-with-python.html" hidden></a>
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="joaorafaelm/notebook"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+</script>
+<a class="u-url" href="/notebook/nlp/2017/08/24/text-classification-with-python.html" hidden></a>
 </article>
 
       </div>

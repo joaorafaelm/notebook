@@ -111,17 +111,24 @@ window.onload = wrap_img;
     </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <blockquote>
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#what-is-graphql">What is GraphQL?</a></li>
+<li class="toc-entry toc-h1"><a href="#getting-started">Getting started</a></li>
+<li class="toc-entry toc-h1"><a href="#models-and-graphql-schema">Models and GraphQL Schema</a></li>
+<li class="toc-entry toc-h1"><a href="#querying-and-debugging">Querying and debugging</a></li>
+</ul><blockquote>
   <p><strong>TL;DR</strong> Jump to the <a href="#models-and-graphql-schema">coding part</a> or get the code <a href="https://github.com/joaorafaelm/graphql-django-example">here</a>.</p>
 </blockquote>
 
-<h1 id="what-is-graphql">What is GraphQL?</h1>
+<h1 id="what-is-graphql">
+<a class="anchor" href="#what-is-graphql" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is GraphQL?</h1>
 <p>GraphQL query is a string that is sent to a server to be interpreted and fulfilled, which then returns JSON back to the client.
 It was created by Facebook in 2012 and the first <a href="http://facebook.github.io/graphql/">specification draft</a> was made public in 2015.</p>
 
 <p>In this tutorial I will cover the basics of working with GraphQL and Django.</p>
 
-<h1 id="getting-started">Getting started</h1>
+<h1 id="getting-started">
+<a class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started</h1>
 <p>Before creating the project and all, make sure you have <a href="https://virtualenv.pypa.io/en/stable/">virtualenv</a> installed, so that the packages used in this tutorial won’t be installed system-wide.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Clone the repo</span>
@@ -140,7 +147,8 @@ python manage.py migrate<span class="p">;</span>
 
 <p>Run <code class="language-plaintext highlighter-rouge">python manage.py loaddata books.json</code> to populate the db, or run <code class="language-plaintext highlighter-rouge">python manage.py createsuperuser</code> and then add some data using the admin interface.</p>
 
-<h1 id="models-and-graphql-schema">Models and GraphQL Schema</h1>
+<h1 id="models-and-graphql-schema">
+<a class="anchor" href="#models-and-graphql-schema" aria-hidden="true"><span class="octicon octicon-link"></span></a>Models and GraphQL Schema</h1>
 <p>This example is going to use the models Author, Book and Publisher.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># bookstore/store/models.py
 </span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
@@ -234,7 +242,8 @@ python manage.py migrate<span class="p">;</span>
 </code></pre></div></div>
 <p>You can now run <code class="language-plaintext highlighter-rouge">python manage.py runserver</code> and start using the API at <a href="http://localhost:8000/graphql">http://localhost:8000/graphql</a>.</p>
 
-<h1 id="querying-and-debugging">Querying and debugging</h1>
+<h1 id="querying-and-debugging">
+<a class="anchor" href="#querying-and-debugging" aria-hidden="true"><span class="octicon octicon-link"></span></a>Querying and debugging</h1>
 <p><a href="https://github.com/graphql/graphiql">GraphiQL</a> provides a graphical interactive in-browser GraphQL IDE, including some features such as syntax highlighting, real-time error reporting, automatic query completion etc.</p>
 
 <p>I will show some query examples, but you can learn more about querying at <a href="http://graphql.org/learn/queries/">graphql.org/learn/queries/</a>.</p>
@@ -316,7 +325,16 @@ python manage.py migrate<span class="p">;</span>
 
 <p>All this code is on my <a href="https://github.com/joaorafaelm/graphql-django-example/">Github</a>. Please do fork it and make pull requests regarding any issues or improvements you may have with my code.</p>
 
-  </div><a class="u-url" href="/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html" hidden></a>
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="joaorafaelm/notebook"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+</script>
+<a class="u-url" href="/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html" hidden></a>
 </article>
 
       </div>
