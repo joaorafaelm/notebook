@@ -471,6 +471,8 @@ li .post-meta-description { color: rgba(255, 255, 255, 0.69) !important; }
 
 .site-header { border: 0 !important; }
 
+#notebook-container pre { padding: 10px !important; }
+
 .language-python + .language-plaintext { border-left: 1px solid grey; margin-left: 1rem !important; }
 
 [class^="language-"]:not(.language-plaintext) pre, [class^="language-"]:not(.language-plaintext) code { background-color: #1e1e1e !important; color: #f8f8f2; }
