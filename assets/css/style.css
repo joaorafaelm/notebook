@@ -461,6 +461,14 @@ canvas { filter: invert(100%); }
 
 li .post-meta-description { color: rgba(255, 255, 255, 0.69) !important; }
 
+.site-footer { border-top: 0 !important; }
+
+.footer-col-wrapper { display: none !important; }
+
+.social-media-list li a, .pagination li a { border: 0 !important; }
+
+.site-header { border: 0 !important; }
+
 .language-python + .language-plaintext { border-left: 1px solid grey; margin-left: 1rem !important; }
 
 [class^="language-"]:not(.language-plaintext) pre, [class^="language-"]:not(.language-plaintext) code { background-color: #1e1e1e !important; color: #f8f8f2; }
