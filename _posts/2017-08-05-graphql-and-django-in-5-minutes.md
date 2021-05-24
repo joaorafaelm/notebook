@@ -213,6 +213,4 @@ Response:
 }
 ```
 
----
-
 All this code is on my [Github](https://github.com/joaorafaelm/graphql-django-example/). Please do fork it and make pull requests regarding any issues or improvements you may have with my code.
