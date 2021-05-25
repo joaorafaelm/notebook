@@ -4,8 +4,9 @@ title: About
 permalink: /about/
 ---
 
-This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
-
-
-
-[^1]:a blogging platform that natively supports Jupyter notebooks in addition to other formats.
+### Hi 👋
+ I'm a remote software developer, currently living in Brazil. You can find some open source projects I've been working on in my [github](https://github.com/joaorafaelm). Reach me at [  
+&nbsp;&nbsp;&nbsp;&nbsp;[joaoraf@me.com](mailto:joaoraf@me.com),  
+&nbsp;&nbsp;&nbsp;&nbsp;[linkedin](https://www.linkedin.com/in/joaoraf),  
+&nbsp;&nbsp;&nbsp;&nbsp;[@jrmol](https://twitter.com/jrmol),  
+].

@@ -3,18 +3,18 @@ layout: post
 title: Text Classification with Python
 categories: [nlp]
 comments: true
-toc: true
+toc: false
 ---
 
 > If you are already familiar with what text classification is, you might want to jump to [this part](#testing-the-algorithms), or get the code [here](https://github.com/joaorafaelm/text-classification-python).
 
-# What is Text Classification?
+## What is Text Classification?
 Document or text classification is used to classify information, that is, assign a category to a text; it can be a document, a tweet, a simple message, an email, and so on.
 In this article, I will show how you can classify retail products into categories. Although in this example the categories are structured in a hierarchy, to keep it simple I will consider all subcategories as top-level.
 
 *If you are looking for complex implementations of large scale hierarchical text classification, I will leave links to some really good papers and projects at the [end](#conclusion) of this post.*
 
-# Getting started
+## Getting started
 Now, before you go any further, make sure you have installed [Python3+](https://www.python.org/downloads/) and [virtualenv](https://virtualenv.pypa.io/en/stable/) *(optional, but I highly recommend you to use it)*.
 
 Let's break down the problem into steps:
@@ -23,7 +23,7 @@ Let's break down the problem into steps:
 - [Extracting features from the dataset](#extracting-features-from-the-dataset)
 - [Testing the algorithms](#testing-the-algorithms)
 
-# Setting up the environment
+## Setting up the environment
 The main packages used in this projects are: [sklearn](http://scikit-learn.org), [nltk](http://www.nltk.org) and [dataset](https://dataset.readthedocs.io/en/latest/).
 Due to the size of the data-set, it might take some time to clone/download the repository; NLTK data is also considerably big.
 Run the following commands to setup the project structure and download the required packages:
@@ -42,7 +42,7 @@ pip install -r requirements.txt;
 python -m nltk.downloader all;
 ```
 
-# Gathering the data
+## Gathering the data
 The dataset that will be used was created by [scraping](https://en.wikipedia.org/wiki/Web_scraping) some products from Amazon. Scraping might be fine for projects where only a small amount of data is required, but it can be a really slow process since it is very simple for a server to detect a robot, unless you are rotating over a list of proxies, which can slow the process even more.
 
 Using [this script](https://github.com/joaorafaelm/text-classification-python/blob/master/amazon_scrape.py), I downloaded information of over 22,000 products, organized into 42 top-level categories, and a total of 6233 subcategories. See the whole category tree structure [here](https://github.com/joaorafaelm/text-classification-python/blob/master/category_tree.txt).
@@ -63,7 +63,7 @@ python data_prep.py
 ```
 The script will create a new file called **products.json** at the root of the project, and print out the category tree structure. Change the value of the variables `default_depth`, `min_samples` and `domain` if you need more data.
 
-# Extracting features from the dataset
+## Extracting features from the dataset
 In order to run machine learning algorithms, we need to transform the text into numerical vectors. [Bag-of-words](https://en.wikipedia.org/wiki/Bag-of-words_model) is one of the most used models, it assigns a numerical value to a word, creating a list of numbers. It can also assign a value to a set of words, known as [N-gram](https://en.wikipedia.org/wiki/N-gram).
 
 Scikit provides a vectorizer called [TfidfVectorizer](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html) which transforms the text based on the bag-of-words/n-gram model, additionally, it computes term frequencies and evaluate each word using the [tf-idf](https://en.wikipedia.org/wiki/Tf–idf) weighting scheme.
@@ -76,7 +76,7 @@ With *Lemmatisation* we can group together the inflected forms of a word. For ex
 
 It is also worth noting that some words despite the fact that they appear frequently, they do not really make any difference for classification, in fact they could even help misclassify a text. Words like 'a', 'an', 'the', 'to', 'or' etc, are known as [stop-words](https://en.wikipedia.org/wiki/Stop_words). These words can be ignored during the [tokenization](https://nlp.stanford.edu/IR-book/html/htmledition/tokenization-1.html) process.
 
-# Testing the algorithms
+## Testing the algorithms
 Now that we have all the features and labels, it is time to train the classifiers. There are a number of algorithms you can use for this type of problem, for example: Multinomial Naive Bayes, Linear SVC, SGD Classifier, K-Neighbors Classifier, Random Forest Classifier.
 Inside the file [classify.py](https://github.com/joaorafaelm/text-classification-python/blob/master/classify.py) you can find an example using the SGDClassifier.
 Run it yourself using the command:
@@ -164,13 +164,13 @@ The *precision* is the percentage of the test samples that were classified to th
 
 The *recall* is the percentage of all the test samples that originally belonged to the category and in the evaluation process were correctly classified to the category.
 
-# Conclusion
+## Conclusion
 As the category tree gets bigger, and you have more and more data to classify, you cannot use a model as simple as the one above (well, you can but its precision will be very low, not to mention the computational cost). Another important thing to notice, is how you structure the categories, in amazon category structure, a lot of subcategories are so confused that I doubt even humans could correctly classify products to them.
 The full code of this post can be found [here](https://github.com/joaorafaelm/text-classification-python).
 
 If you noticed something wrong, or you know something that can make the algorithms better, please do comment bellow. Thanks for reading!
 
-# Further reading
+## Further reading
 - [Classifier Statistics](https://monkeylearn.com/docs/article/classifier-statistics/)
 
 - [A Meta-Top-Down Method for Large-Scale Hierarchical Classification](http://ieeexplore.ieee.org/document/6522404/?reload=true)

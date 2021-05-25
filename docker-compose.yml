@@ -38,7 +38,8 @@ services:
     restart: unless-stopped
     ports:
       - "4000:4000"
+      - "35729:35729"
     volumes:
       - .:/data/
     command: >
-      bash -c "chmod -R u+rw . && jekyll serve --host 0.0.0.0 --trace --strict_front_matter"
+      bash -c "chmod -R u+rw . && jekyll serve --host 0.0.0.0 --trace --strict_front_matter --livereload --incremental --livereload --force_polling"

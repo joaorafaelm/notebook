@@ -25,8 +25,8 @@ a:hover {
 }
 
 .site-nav {
-    background-color: $dark-grey;
     border-color: $overlay-light;
+    background-color: #1e1e1e !important;
 }
 
 * {
@@ -44,7 +44,7 @@ pre, code {
 }
 
 .post-meta {
-    color: $low-emph;
+    color: rgba(255, 255, 255, 0.69);
 }
 
 .post-content p, .post-content li {
@@ -106,6 +106,7 @@ li .post-meta-description {
 
 .site-header{
     border: 0 !important;
+    background: #1e1e1e;
 }
 
 #notebook-container pre {

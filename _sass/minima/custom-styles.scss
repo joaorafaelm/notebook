@@ -10,3 +10,24 @@
 
 // If you want to turn off dark background for syntax highlighting, comment or delete the below line.
 @import "minima/fastpages-dracula-highlight"; 
+
+// search + home
+.search-results-wrap:not(:empty) + .home{
+    display: none;
+}
+
+.wrapper {
+    max-width: 700px !important;
+}
+
+.site-title:hover {
+    text-decoration: none;
+}
+
+.page-content {
+    padding: 10px 0;
+}
+
+p, pre {
+    line-height: 1.7;
+}
