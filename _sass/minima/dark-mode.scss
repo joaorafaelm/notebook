@@ -111,3 +111,7 @@ li .post-meta-description {
 #notebook-container pre {
     padding: 10px !important;
 }
+
+#notebook-container pre:empty {
+    display: none;
+}
