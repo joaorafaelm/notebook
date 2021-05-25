@@ -4,7 +4,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>GraphQL and Django in 5 minutes | notebooks</title>
+<title>GraphQL and Django in 5 minutes | 📝</title>
 <meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="GraphQL and Django in 5 minutes" />
 <meta property="og:locale" content="en_US" />
@@ -12,13 +12,13 @@
 <meta property="og:description" content="TL;DR Jump to the coding part or get the code here." />
 <link rel="canonical" href="https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html" />
 <meta property="og:url" content="https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html" />
-<meta property="og:site_name" content="notebooks" />
+<meta property="og:site_name" content="📝" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2017-08-05T00:00:00-05:00" />
 <script type="application/ld+json">
 {"url":"https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html","@type":"BlogPosting","headline":"GraphQL and Django in 5 minutes","dateModified":"2017-08-05T00:00:00-05:00","datePublished":"2017-08-05T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://joaorafaelm.github.io/notebook/graphql/django/2017/08/05/graphql-and-django-in-5-minutes.html"},"description":"TL;DR Jump to the coding part or get the code here.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/notebook/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://joaorafaelm.github.io/notebook/feed.xml" title="notebooks" /><!-- the google_analytics_id gets auto inserted from the config file -->
+<link rel="stylesheet" href="/notebook/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://joaorafaelm.github.io/notebook/feed.xml" title="📝" /><!-- the google_analytics_id gets auto inserted from the config file -->
 
 
 
@@ -68,7 +68,7 @@ window.onload = wrap_img;
 </head>
 <body><header class="site-header">
 
-  <div class="wrapper"><a class="site-title" rel="author" href="/notebook/">notebooks</a><nav class="site-nav">
+  <div class="wrapper"><a class="site-title" rel="author" href="/notebook/">📝</a><nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
         <label for="nav-trigger">
           <span class="menu-icon">
@@ -78,7 +78,7 @@ window.onload = wrap_img;
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/notebook/about/">About</a><a class="page-link" href="/notebook/search/">Search</a><a class="page-link" href="/notebook/categories/">Tags</a></div>
+        <div class="trigger"><a class="page-link" href="/notebook/about/">About</a></div>
       </nav></div>
 </header>
 <main class="page-content" aria-label="Content">
@@ -94,10 +94,8 @@ window.onload = wrap_img;
     
       3 min read
     
-</span></p>
-
-    
-      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+</span>
+      <span class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
       
         <a class="category-tags-link" href="/notebook/categories/#graphql">graphql</a>
         &nbsp;
@@ -105,30 +103,25 @@ window.onload = wrap_img;
         <a class="category-tags-link" href="/notebook/categories/#django">django</a>
         
       
-      </p>
+      </span>
     
+
+    </p>
 
     </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <ul class="section-nav">
-<li class="toc-entry toc-h1"><a href="#what-is-graphql">What is GraphQL?</a></li>
-<li class="toc-entry toc-h1"><a href="#getting-started">Getting started</a></li>
-<li class="toc-entry toc-h1"><a href="#models-and-graphql-schema">Models and GraphQL Schema</a></li>
-<li class="toc-entry toc-h1"><a href="#querying-and-debugging">Querying and debugging</a></li>
-</ul><blockquote>
+    <blockquote>
   <p><strong>TL;DR</strong> Jump to the <a href="#models-and-graphql-schema">coding part</a> or get the code <a href="https://github.com/joaorafaelm/graphql-django-example">here</a>.</p>
 </blockquote>
 
-<h1 id="what-is-graphql">
-<a class="anchor" href="#what-is-graphql" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is GraphQL?</h1>
+<h1 id="what-is-graphql">What is GraphQL?</h1>
 <p>GraphQL query is a string that is sent to a server to be interpreted and fulfilled, which then returns JSON back to the client.
 It was created by Facebook in 2012 and the first <a href="http://facebook.github.io/graphql/">specification draft</a> was made public in 2015.</p>
 
 <p>In this tutorial I will cover the basics of working with GraphQL and Django.</p>
 
-<h1 id="getting-started">
-<a class="anchor" href="#getting-started" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting started</h1>
+<h1 id="getting-started">Getting started</h1>
 <p>Before creating the project and all, make sure you have <a href="https://virtualenv.pypa.io/en/stable/">virtualenv</a> installed, so that the packages used in this tutorial won’t be installed system-wide.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Clone the repo</span>
@@ -147,8 +140,7 @@ python manage.py migrate<span class="p">;</span>
 
 <p>Run <code class="language-plaintext highlighter-rouge">python manage.py loaddata books.json</code> to populate the db, or run <code class="language-plaintext highlighter-rouge">python manage.py createsuperuser</code> and then add some data using the admin interface.</p>
 
-<h1 id="models-and-graphql-schema">
-<a class="anchor" href="#models-and-graphql-schema" aria-hidden="true"><span class="octicon octicon-link"></span></a>Models and GraphQL Schema</h1>
+<h1 id="models-and-graphql-schema">Models and GraphQL Schema</h1>
 <p>This example is going to use the models Author, Book and Publisher.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># bookstore/store/models.py
 </span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
@@ -242,8 +234,7 @@ python manage.py migrate<span class="p">;</span>
 </code></pre></div></div>
 <p>You can now run <code class="language-plaintext highlighter-rouge">python manage.py runserver</code> and start using the API at <a href="http://localhost:8000/graphql">http://localhost:8000/graphql</a>.</p>
 
-<h1 id="querying-and-debugging">
-<a class="anchor" href="#querying-and-debugging" aria-hidden="true"><span class="octicon octicon-link"></span></a>Querying and debugging</h1>
+<h1 id="querying-and-debugging">Querying and debugging</h1>
 <p><a href="https://github.com/graphql/graphiql">GraphiQL</a> provides a graphical interactive in-browser GraphQL IDE, including some features such as syntax highlighting, real-time error reporting, automatic query completion etc.</p>
 
 <p>I will show some query examples, but you can learn more about querying at <a href="http://graphql.org/learn/queries/">graphql.org/learn/queries/</a>.</p>

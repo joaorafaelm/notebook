@@ -341,15 +341,15 @@ h2 { margin-top: 2rem !important; }
 
 h3, h4 { margin-top: 1.5rem !important; }
 
-p { margin-top: 1rem !important; margin-bottom: 1rem !important; }
+p { margin-top: 1rem !important; margin-bottom: 1rem !important; text-align: justify; }
 
-h1, h2, h3, h4 { font-weight: normal !important; margin-bottom: 0.5rem !important; }
+h1, h2, h3, h4 { font-weight: bold !important; margin: 30px 0 !important; }
 
 h1 code, h2 code, h3 code, h4 code { font-size: 100%; }
 
-pre { margin-bottom: 1.5rem !important; }
+pre { margin-bottom: 1.5rem !important; box-shadow: 0 4px 50px rgba(0, 0, 0, 0.5); }
 
-.post-title { margin-top: .5rem !important; }
+.post-title { margin-top: 20px !important; margin-bottom: 0 !important; }
 
 li h3, li h4 { margin-top: .05rem !important; margin-bottom: .05rem !important; }
 
@@ -373,7 +373,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .category-tags { margin-top: .25rem !important; margin-bottom: .25rem !important; font-size: 105%; }
 
-.post-meta-title, .post-meta { margin-top: .25em !important; margin-bottom: .25em !important; font-size: 105%; }
+.post-meta-title, .post-meta { margin-top: .25em !important; margin-bottom: .25em !important; font-style: italic; }
 
 .page-description { margin-top: .5rem !important; margin-bottom: .5rem !important; color: #585858; font-size: 115%; }
 
@@ -435,7 +435,7 @@ a:hover { color: rgba(255, 255, 255, 0.87) !important; }
 
 .site-title, .site-title:visited, .site-nav, .page-link { color: rgba(255, 255, 255, 0.87) !important; }
 
-.site-nav { background-color: #181818; border-color: #383838; }
+.site-nav { border-color: #383838; background-color: #1e1e1e !important; }
 
 * { scrollbar-color: #181818 #383838; }
 
@@ -443,7 +443,7 @@ pre, code { border-color: transparent; background-color: #242424; }
 
 .page-description { color: rgba(255, 255, 255, 0.69); }
 
-.post-meta { color: rgba(255, 255, 255, 0.38); }
+.post-meta { color: rgba(255, 255, 255, 0.69); }
 
 .post-content p, .post-content li { color: rgba(255, 255, 255, 0.69); }
 
@@ -469,7 +469,7 @@ li .post-meta-description { color: rgba(255, 255, 255, 0.69) !important; }
 
 .social-media-list li a, .pagination li a { border: 0 !important; }
 
-.site-header { border: 0 !important; }
+.site-header { border: 0 !important; background: #1e1e1e; }
 
 #notebook-container pre { padding: 10px !important; }
 
@@ -496,7 +496,7 @@ li .post-meta-description { color: rgba(255, 255, 255, 0.69) !important; }
 /* Dracula Theme v1.2.5 https://github.com/zenorocha/dracula-theme Copyright 2016, All rights reserved Code licensed under the MIT license */
 .highlight { background: #1e1e1e !important; color: #f8f8f2 !important; }
 
-.highlight pre, .highlight code { background: #1e1e1e; color: #f8f8f2; font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace !important; font-size: 12px !important; }
+.highlight pre, .highlight code { background: #1e1e1e; color: #f8f8f2; font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace !important; font-size: 13px !important; }
 
 .highlight .hll, .highlight .s, .highlight .sa, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .sr, .highlight .s1, .highlight .ss { color: #e7997a; }
 
@@ -529,5 +529,15 @@ li .post-meta-description { color: rgba(255, 255, 255, 0.69) !important; }
 .highlight .gd { color: #ff5555; }
 
 p code { font-size: 12px !important; }
+
+.search-results-wrap:not(:empty) + .home { display: none; }
+
+.wrapper { max-width: 700px !important; }
+
+.site-title:hover { text-decoration: none; }
+
+.page-content { padding: 10px 0; }
+
+p, pre { line-height: 1.7; }
 
 /*# sourceMappingURL=style.css.map */
