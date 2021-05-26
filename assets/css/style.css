@@ -445,6 +445,8 @@ pre code { font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace 
 
 a { color: #8be9fd !important; }
 
+.site-nav { z-index: 10; }
+
 /*-----------------------------------*/
 /*----- ADD YOUR STYLES BELOW -------*/
 html, body, input, textarea, select, button { color: rgba(255, 255, 255, 0.87) !important; background-color: #181818 !important; }
