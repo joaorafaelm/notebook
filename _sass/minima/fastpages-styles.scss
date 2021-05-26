@@ -193,15 +193,16 @@ h6:hover .anchor-link {
     box-shadow: 0 4px 30px rgba(0, 0, 0, .3) !important;
 }
 
-.js-search-results {padding-top: 0.2rem;}
+.js-search-results {margin-top: -10px}
 .search-results-list { 
     margin-left: 0 !important;
 }
 .search-results-list-item {padding-bottom: 1rem; list-style:none !important}
 .search-results-list-item .search-result-title {
-  font-size: 14px;
+  font-size: 15px;
   color: #8be9fd;
   font-weight: bold;
+  margin-left: 5px;
 }
 .search-result-rel-url {color: silver;}
 .search-results-list-item a {display: block; color: white; line-height: 2}
