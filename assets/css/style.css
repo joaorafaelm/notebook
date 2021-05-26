@@ -385,7 +385,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .category-tags-icon { font-size: 75% !important; padding-left: 0.375em; opacity: 35%; }
 
-.category-tags-link { color: #bb8181 !important; font-size: 13px !important; }
+.category-tags-link { color: #ff79c6 !important; font-size: 13px !important; }
 
 .form-control { border: 0 !important; box-shadow: none !important; background-color: #1e1e1e !important; padding: 15px 50px !important; margin-top: 10px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3) !important; }
 
@@ -437,13 +437,17 @@ pre code { font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace 
 
 .search .repl { position: absolute; top: 14px; left: 15px; font-weight: normal; color: rgba(255, 255, 255, 0.4) !important; }
 
+.badges { margin: 20px 0 -40px -8px; }
+
+.section-nav { margin-left: 20px; }
+
+a { color: #8be9fd !important; }
+
 /*-----------------------------------*/
 /*----- ADD YOUR STYLES BELOW -------*/
 html, body, input, textarea, select, button { color: rgba(255, 255, 255, 0.87) !important; background-color: #181818 !important; }
 
-a { color: #4bbaff !important; text-underline-offset: 5px !important; }
-
-a:hover { color: rgba(255, 255, 255, 0.87) !important; }
+a { text-underline-offset: 5px !important; color: #8be9fd !important; }
 
 .site-title, .site-title:visited, .site-nav, .page-link { color: rgba(255, 255, 255, 0.87) !important; }
 
@@ -497,7 +501,7 @@ li .post-meta-description { color: rgba(255, 255, 255, 0.69) !important; }
 
 .input_area pre, .input_area div { margin-bottom: 1.0rem !important; margin-top: 1.5rem !important; padding-bottom: 0 !important; padding-top: 0 !important; background: #1e1e1e !important; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; font-family: Menlo, Monaco, Consolas, "Lucida Console", Roboto, Ubuntu, monospace; border-radius: 5px; font-size: 105%; }
 
-.output_area pre, .output_area div { margin-bottom: 1rem !important; margin-top: 0rem !important; padding-bottom: 0 !important; padding-top: 0 !important; }
+.output_area pre, .output_area div { margin-bottom: 0 !important; margin-top: 0rem !important; padding-bottom: 0 !important; padding-top: 0 !important; }
 
 .input_area pre { border-left: 1px solid lightcoral; }
 
