@@ -32,8 +32,18 @@ img.emoji{
     color: #515151;
 }
 
+.post-list {
+    margin-top: -25px !important;
+}
+
+.post-list li {
+    margin: 10px 0 !important;
+}
+
 .post-link{
-    font-weight: normal;
+    display: inline;
+    font-weight: bold;
+    font-size: 15px;
 }
 
 // change padding of headings
@@ -69,7 +79,7 @@ pre {
 }
 
 // make sure the post title doesn't have too much spacing
-.post-title { margin-top: 20px !important; margin-bottom: 0 !important}
+.post-title { margin-top: 0px !important; margin-bottom: 0 !important}
 
 li {
   h3, h4 {
@@ -175,6 +185,7 @@ h6:hover .anchor-link {
     box-shadow: none !important;
     background-color: rgb(19, 19, 19) !important;
     padding: 15px !important;
+    margin-top: 10px;
 }
 
 .js-search-results {padding-top: 0.2rem;}
