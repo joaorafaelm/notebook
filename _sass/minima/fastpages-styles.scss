@@ -194,13 +194,17 @@ h6:hover .anchor-link {
 }
 
 .js-search-results {padding-top: 0.2rem;}
-.search-results-list-item {padding-bottom: 1rem;}
+.search-results-list { 
+    margin-left: 0 !important;
+}
+.search-results-list-item {padding-bottom: 1rem; list-style:none !important}
 .search-results-list-item .search-result-title {
   font-size: 14px;
-  color: #909090;
+  color: #8be9fd;
+  font-weight: bold;
 }
 .search-result-rel-url {color: silver;}
-.search-results-list-item a {display: block; color: white;}
+.search-results-list-item a {display: block; color: white; line-height: 2}
 .search-results-list-item a:hover, .search-results-list-item a:focus {text-decoration: none;}
 .search-results-list-item a:hover .search-result-title {text-decoration: underline;}
 
@@ -216,8 +220,11 @@ h6:hover .anchor-link {
   margin-bottom:.02rem !important;
 }
 .search-result-highlight {
-  color: white;
-  font-weight:bold;
+  color: rgb(46, 46, 46);
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 4px;
+  border-radius: 2px;
 }
 
 table {
