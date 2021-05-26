@@ -353,7 +353,7 @@ h1, h2, h3, h4 { font-weight: bold !important; margin: 30px 0 !important; }
 
 h1 code, h2 code, h3 code, h4 code { font-size: 100%; }
 
-pre { margin-bottom: 1.5rem !important; box-shadow: 0 4px 50px rgba(0, 0, 0, 0.5); }
+pre { margin-bottom: 1.5rem !important; }
 
 .post-title { margin-top: 0px !important; margin-bottom: 0 !important; }
 
@@ -387,7 +387,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .category-tags-link { color: #ff79c6 !important; font-size: 13px !important; }
 
-.form-control { border: 0 !important; box-shadow: none !important; background-color: #1e1e1e !important; padding: 15px 50px !important; margin-top: 10px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3) !important; }
+.form-control { border: 0 !important; background-color: #1e1e1e !important; padding: 15px 50px !important; margin-top: 10px; }
 
 .js-search-results { margin-top: -10px; }
 
