@@ -389,7 +389,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .form-control { border: 0 !important; background-color: #1e1e1e !important; padding: 15px 50px !important; margin-top: 10px; box-shadow: none !important; }
 
-.js-search-results { margin-top: -13px; }
+.js-search-results { margin-top: -12px; }
 
 .search-results-list { margin-left: 0 !important; }
 
