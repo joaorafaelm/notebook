@@ -409,7 +409,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .search-result-preview { color: #777; font-size: 14px; margin-top: .02rem !important; margin-bottom: .02rem !important; }
 
-.search-result-highlight { color: #2e2e2e; font-weight: bold; background: rgba(255, 255, 255, 0.6); padding: 4px; border-radius: 2px; }
+.search-result-highlight { color: #ff79c6; font-weight: bold; }
 
 table { white-space: normal; max-width: 100%; font-size: 100%; border: none; }
 
