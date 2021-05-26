@@ -391,13 +391,15 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .js-search-results { padding-top: 0.2rem; }
 
-.search-results-list-item { padding-bottom: 1rem; }
+.search-results-list { margin-left: 0 !important; }
 
-.search-results-list-item .search-result-title { font-size: 14px; color: #909090; }
+.search-results-list-item { padding-bottom: 1rem; list-style: none !important; }
+
+.search-results-list-item .search-result-title { font-size: 14px; color: #8be9fd; font-weight: bold; }
 
 .search-result-rel-url { color: silver; }
 
-.search-results-list-item a { display: block; color: white; }
+.search-results-list-item a { display: block; color: white; line-height: 2; }
 
 .search-results-list-item a:hover, .search-results-list-item a:focus { text-decoration: none; }
 
@@ -407,7 +409,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .search-result-preview { color: #777; font-size: 14px; margin-top: .02rem !important; margin-bottom: .02rem !important; }
 
-.search-result-highlight { color: white; font-weight: bold; }
+.search-result-highlight { color: #2e2e2e; font-weight: bold; background: rgba(255, 255, 255, 0.6); padding: 4px; border-radius: 2px; }
 
 table { white-space: normal; max-width: 100%; font-size: 100%; border: none; }
 
