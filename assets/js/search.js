@@ -193,16 +193,16 @@ function initSearch() {
             resultLink.setAttribute('href', doc.url);
             resultsListItem.appendChild(resultLink);
   
-            var resultTitle = document.createElement('div');
+            var resultRelUrl = document.createElement('span');
+            resultRelUrl.classList.add('post-meta');
+            resultRelUrl.innerText = doc.date;
+            resultLink.appendChild(resultRelUrl);
+  
+            var resultTitle = document.createElement('span');
             resultTitle.classList.add('search-result-title');
             resultTitle.innerText = doc.title;
-            resultLink.appendChild(resultTitle);
-  
-            var resultRelUrl = document.createElement('span');
-            resultRelUrl.classList.add('search-result-rel-date');
-            resultRelUrl.innerText = doc.date;
-            resultTitle.appendChild(resultRelUrl);
-  
+            resultRelUrl.appendChild(resultTitle);
+ 
             var metadata = result.matchData.metadata;
             var contentFound = false;
             for (var j in metadata) {
@@ -210,7 +210,7 @@ function initSearch() {
                 var position = metadata[j].title.position[0];
                 var start = position[0];
                 var end = position[0] + position[1];
-                resultTitle.innerHTML = doc.title.substring(0, start) + '<span class="search-result-highlight">' + doc.title.substring(start, end) + '</span>' + doc.title.substring(end, doc.title.length)+'<span class="search-result-rel-date">'+doc.date+'</span>';
+                resultTitle.innerHTML = doc.title.substring(0, start) + '<span class="search-result-highlight">' + doc.title.substring(start, end) + '</span>' + doc.title.substring(end, doc.title.length);
   
               } else if (metadata[j].content && !contentFound) {
                 contentFound = true;
