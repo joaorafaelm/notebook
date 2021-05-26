@@ -337,7 +337,7 @@ img.emoji { display: inline !important; vertical-align: baseline !important; }
 
 .post-list li { margin: 10px 0 !important; }
 
-.post-list span { margin-right: 5px; word-spacing: 3px; }
+.post-list span { margin-right: 1px; }
 
 .post-link { display: inline; font-weight: bold; font-size: 15px; }
 
@@ -389,7 +389,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .form-control { border: 0 !important; background-color: #1e1e1e !important; padding: 15px 50px !important; margin-top: 10px; box-shadow: none !important; }
 
-.js-search-results { margin-top: -10px; }
+.js-search-results { margin-top: -13px; }
 
 .search-results-list { margin-left: 0 !important; }
 
