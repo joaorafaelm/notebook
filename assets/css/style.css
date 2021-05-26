@@ -387,7 +387,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .category-tags-link { color: #bb8181 !important; font-size: 13px !important; }
 
-.form-control { border: 0 !important; box-shadow: none !important; background-color: #1e1e1e !important; padding: 15px !important; margin-top: 10px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3) !important; }
+.form-control { border: 0 !important; box-shadow: none !important; background-color: #1e1e1e !important; padding: 15px 50px !important; margin-top: 10px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3) !important; }
 
 .js-search-results { padding-top: 0.2rem; }
 
@@ -430,6 +430,12 @@ table th { text-align: center !important; }
 .code_cell { margin: 1.5rem 0px !important; }
 
 pre code { font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace !important; font-size: 12px !important; }
+
+.search-input-wrap { position: relative; }
+
+.search input { caret-color: rgba(255, 255, 255, 0.4) !important; }
+
+.search .repl { position: absolute; top: 14px; left: 15px; font-weight: normal; color: rgba(255, 255, 255, 0.4) !important; }
 
 /*-----------------------------------*/
 /*----- ADD YOUR STYLES BELOW -------*/
