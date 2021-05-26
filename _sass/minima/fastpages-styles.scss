@@ -40,6 +40,11 @@ img.emoji{
     margin: 10px 0 !important;
 }
 
+.post-list span {
+    margin-right: 5px;
+    word-spacing: 3px;
+}
+
 .post-link{
     display: inline;
     font-weight: bold;
@@ -182,9 +187,10 @@ h6:hover .anchor-link {
 .form-control{
     border: 0 !important;
     box-shadow: none !important;
-    background-color: rgb(19, 19, 19) !important;
+    background-color: #1e1e1e !important;
     padding: 15px !important;
     margin-top: 10px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, .3) !important;
 }
 
 .js-search-results {padding-top: 0.2rem;}
