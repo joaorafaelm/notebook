@@ -337,6 +337,8 @@ img.emoji { display: inline !important; vertical-align: baseline !important; }
 
 .post-list li { margin: 10px 0 !important; }
 
+.post-list span { margin-right: 5px; word-spacing: 3px; }
+
 .post-link { display: inline; font-weight: bold; font-size: 15px; }
 
 h1 { margin-top: 2.5rem !important; }
@@ -385,7 +387,7 @@ h1:hover .anchor-link, h2:hover .anchor-link, h3:hover .anchor-link, h4:hover .a
 
 .category-tags-link { color: #bb8181 !important; font-size: 13px !important; }
 
-.form-control { border: 0 !important; box-shadow: none !important; background-color: #131313 !important; padding: 15px !important; margin-top: 10px; }
+.form-control { border: 0 !important; box-shadow: none !important; background-color: #1e1e1e !important; padding: 15px !important; margin-top: 10px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3) !important; }
 
 .js-search-results { padding-top: 0.2rem; }
 
