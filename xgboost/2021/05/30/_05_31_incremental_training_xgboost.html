@@ -137,6 +137,13 @@ window.onload = wrap_img;
 
 <div class="container" id="notebook-container">
         
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="https://colab.research.google.com/github/joaorafaelm/notebook/blob/master/_notebooks/2021_05_31_incremental_training_xgboost.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" /></a></p>
+
+</div>
+</div>
+</div>
     
     
 <div class="cell border-box-sizing code_cell rendered">
@@ -220,9 +227,6 @@ Requirement already satisfied: scipy&gt;=0.17.0 in /usr/local/lib/python3.7/dist
 <span class="nb">print</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">model_1</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xg_test</span><span class="p">),</span> <span class="n">y_test</span><span class="p">))</span>     <span class="c1"># benchmark</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">model_2_v1</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xg_test</span><span class="p">),</span> <span class="n">y_test</span><span class="p">))</span>  <span class="c1"># &quot;before&quot;</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">mean_squared_error</span><span class="p">(</span><span class="n">model_2_v2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">xg_test</span><span class="p">),</span> <span class="n">y_test</span><span class="p">))</span>  <span class="c1"># &quot;after&quot;</span>
-
-<span class="c1"># 23.0475232194</span>
-<span class="c1"># 39.6776876084</span>
 </pre></div>
 
     </div>
