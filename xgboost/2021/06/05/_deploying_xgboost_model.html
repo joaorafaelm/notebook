@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Deploying a XGBoost model | 📝</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Deploying a XGBoost model" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://joaorafaelm.github.io/notebook/xgboost/2021/06/05/_deploying_xgboost_model.html" />
+<meta property="og:url" content="https://joaorafaelm.github.io/notebook/xgboost/2021/06/05/_deploying_xgboost_model.html" />
+<meta property="og:site_name" content="📝" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-05T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://joaorafaelm.github.io/notebook/xgboost/2021/06/05/_deploying_xgboost_model.html","@type":"BlogPosting","headline":"Deploying a XGBoost model","dateModified":"2021-06-05T00:00:00-05:00","datePublished":"2021-06-05T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://joaorafaelm.github.io/notebook/xgboost/2021/06/05/_deploying_xgboost_model.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/notebook/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://joaorafaelm.github.io/notebook/feed.xml" title="📝" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-104187041-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-104187041-1');
+</script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/notebook/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/notebook/">📝</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/notebook/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Deploying a XGBoost model</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-06-05T00:00:00-05:00" itemprop="datePublished">
+        Jun 5, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span>
+      <span class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/notebook/categories/#xgboost">xgboost</a>
+        
+      
+      </span>
+    
+
+    </p>
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-left badges">
+          <div class="px-2">
+
+    <a href="https://github.com/joaorafaelm/notebook/tree/master/_notebooks/2021-06-06_deploying_xgboost_model.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/notebook/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/joaorafaelm/notebook/blob/master/_notebooks/2021-06-06_deploying_xgboost_model.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/notebook/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-06-06_deploying_xgboost_model.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xgboost</span> <span class="k">as</span> <span class="nn">xgb</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">fetch_openml</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Load-data-and-build-a-model">Load data and build a model<a class="anchor-link" href="#Load-data-and-build-a-model"> </a></h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">fetch_openml</span><span class="p">(</span><span class="s2">&quot;titanic&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">as_frame</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_X_y</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_y_train</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">X_train</span><span class="p">[[</span><span class="s2">&quot;pclass&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;fare&quot;</span><span class="p">,</span> <span class="s2">&quot;sibsp&quot;</span><span class="p">,</span> <span class="s2">&quot;parch&quot;</span><span class="p">]],</span> <span class="n">label</span><span class="o">=</span><span class="n">y_train</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">DMatrix</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">X_test</span><span class="p">[[</span><span class="s2">&quot;pclass&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;fare&quot;</span><span class="p">,</span> <span class="s2">&quot;sibsp&quot;</span><span class="p">,</span> <span class="s2">&quot;parch&quot;</span><span class="p">]])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">X_train</span><span class="p">[[</span><span class="s2">&quot;pclass&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;fare&quot;</span><span class="p">,</span> <span class="s2">&quot;sibsp&quot;</span><span class="p">,</span> <span class="s2">&quot;parch&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>pclass</th>
+      <th>age</th>
+      <th>fare</th>
+      <th>sibsp</th>
+      <th>parch</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>662</th>
+      <td>3.0</td>
+      <td>40.0</td>
+      <td>7.2250</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>164</th>
+      <td>1.0</td>
+      <td>35.0</td>
+      <td>26.5500</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>871</th>
+      <td>3.0</td>
+      <td>NaN</td>
+      <td>7.7500</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1298</th>
+      <td>3.0</td>
+      <td>36.0</td>
+      <td>9.5000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1004</th>
+      <td>3.0</td>
+      <td>NaN</td>
+      <td>7.7875</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;base_score&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)),</span>
+    <span class="s2">&quot;eta&quot;</span><span class="p">:</span>  <span class="mf">0.1</span><span class="p">,</span>
+    <span class="s2">&quot;max_depth&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;gamma&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">&quot;objective&quot;</span><span class="p">:</span> <span class="s2">&quot;reg:squarederror&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;eval_metric&quot;</span><span class="p">:</span> <span class="s2">&quot;mae&quot;</span>
+<span class="p">}</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">xgb</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+    <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> 
+    <span class="n">dtrain</span><span class="o">=</span><span class="n">X_y_train</span><span class="p">,</span> 
+    <span class="n">num_boost_round</span><span class="o">=</span><span class="mi">3</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Visualization-of-model">Visualization of model<a class="anchor-link" href="#Visualization-of-model"> </a></h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xgb</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">booster</span> <span class="o">=</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_trees</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_svg output_subarea output_execute_result">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+&lt;!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"&gt;
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: %3 Pages: 1 -->
+<svg width="910pt" height="305pt" viewBox="0.00 0.00 909.53 305.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 301)">
+<title>%3</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-301 905.5346,-301 905.5346,4 -4,4" />
+<!-- 0 -->
+<g id="node1" class="node">
+<title>0</title>
+<ellipse fill="none" stroke="#000000" cx="354.1424" cy="-279" rx="76.0865" ry="18" />
+<text text-anchor="middle" x="354.1424" y="-275.3" font-family="Times,serif" font-size="14.00" fill="#000000">fare&lt;15.1729002</text>
+</g>
+<!-- 1 -->
+<g id="node2" class="node">
+<title>1</title>
+<ellipse fill="none" stroke="#000000" cx="277.1424" cy="-192" rx="46.2923" ry="18" />
+<text text-anchor="middle" x="277.1424" y="-188.3" font-family="Times,serif" font-size="14.00" fill="#000000">age&lt;16.5</text>
+</g>
+<!-- 0&#45;&gt;1 -->
+<g id="edge1" class="edge">
+<title>0&#45;&gt;1</title>
+<path fill="none" stroke="#0000ff" d="M338.188,-260.9735C326.9201,-248.2422 311.6739,-231.0161 299.2372,-216.9642" />
+<polygon fill="#0000ff" stroke="#0000ff" points="301.5391,-214.2841 292.2905,-209.1154 296.2973,-218.9234 301.5391,-214.2841" />
+<text text-anchor="middle" x="356.6424" y="-231.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes, missing</text>
+</g>
+<!-- 2 -->
+<g id="node3" class="node">
+<title>2</title>
+<ellipse fill="none" stroke="#000000" cx="432.1424" cy="-192" rx="50.0912" ry="18" />
+<text text-anchor="middle" x="432.1424" y="-188.3" font-family="Times,serif" font-size="14.00" fill="#000000">pclass&lt;2.5</text>
+</g>
+<!-- 0&#45;&gt;2 -->
+<g id="edge2" class="edge">
+<title>0&#45;&gt;2</title>
+<path fill="none" stroke="#ff0000" d="M375.2282,-261.4273C381.5574,-255.7882 388.352,-249.3522 394.1424,-243 401.209,-235.2479 408.2639,-226.226 414.3426,-217.9444" />
+<polygon fill="#ff0000" stroke="#ff0000" points="417.2964,-219.8313 420.2834,-209.6663 411.6094,-215.75 417.2964,-219.8313" />
+<text text-anchor="middle" x="415.1424" y="-231.8" font-family="Times,serif" font-size="14.00" fill="#000000">no</text>
+</g>
+<!-- 3 -->
+<g id="node4" class="node">
+<title>3</title>
+<ellipse fill="none" stroke="#000000" cx="85.1424" cy="-105" rx="85.2851" ry="18" />
+<text text-anchor="middle" x="85.1424" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=0.0223644935</text>
+</g>
+<!-- 1&#45;&gt;3 -->
+<g id="edge3" class="edge">
+<title>1&#45;&gt;3</title>
+<path fill="none" stroke="#0000ff" d="M246.7195,-178.2146C215.4643,-164.0521 166.4447,-141.8401 130.5892,-125.5931" />
+<polygon fill="#0000ff" stroke="#0000ff" points="131.8674,-122.3298 121.3143,-121.3904 128.9783,-128.7057 131.8674,-122.3298" />
+<text text-anchor="middle" x="202.6424" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes</text>
+</g>
+<!-- 4 -->
+<g id="node5" class="node">
+<title>4</title>
+<ellipse fill="none" stroke="#000000" cx="277.1424" cy="-105" rx="88.2844" ry="18" />
+<text text-anchor="middle" x="277.1424" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=&#45;0.0156309232</text>
+</g>
+<!-- 1&#45;&gt;4 -->
+<g id="edge4" class="edge">
+<title>1&#45;&gt;4</title>
+<path fill="none" stroke="#ff0000" d="M277.1424,-173.9735C277.1424,-162.1918 277.1424,-146.5607 277.1424,-133.1581" />
+<polygon fill="#ff0000" stroke="#ff0000" points="280.6425,-133.0033 277.1424,-123.0034 273.6425,-133.0034 280.6425,-133.0033" />
+<text text-anchor="middle" x="310.6424" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">no, missing</text>
+</g>
+<!-- 5 -->
+<g id="node6" class="node">
+<title>5</title>
+<ellipse fill="none" stroke="#000000" cx="432.1424" cy="-105" rx="48.9926" ry="18" />
+<text text-anchor="middle" x="432.1424" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">parch&lt;0.5</text>
+</g>
+<!-- 2&#45;&gt;5 -->
+<g id="edge5" class="edge">
+<title>2&#45;&gt;5</title>
+<path fill="none" stroke="#0000ff" d="M432.1424,-173.9735C432.1424,-162.1918 432.1424,-146.5607 432.1424,-133.1581" />
+<polygon fill="#0000ff" stroke="#0000ff" points="435.6425,-133.0033 432.1424,-123.0034 428.6425,-133.0034 435.6425,-133.0033" />
+<text text-anchor="middle" x="467.6424" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes, missing</text>
+</g>
+<!-- 6 -->
+<g id="node7" class="node">
+<title>6</title>
+<ellipse fill="none" stroke="#000000" cx="616.1424" cy="-105" rx="76.0865" ry="18" />
+<text text-anchor="middle" x="616.1424" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">fare&lt;23.3500004</text>
+</g>
+<!-- 2&#45;&gt;6 -->
+<g id="edge6" class="edge">
+<title>2&#45;&gt;6</title>
+<path fill="none" stroke="#ff0000" d="M462.5263,-177.6337C492.5691,-163.4287 538.8357,-141.5527 572.7452,-125.5194" />
+<polygon fill="#ff0000" stroke="#ff0000" points="574.4137,-128.602 581.958,-121.1633 571.4215,-122.2738 574.4137,-128.602" />
+<text text-anchor="middle" x="544.1424" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">no</text>
+</g>
+<!-- 11 -->
+<g id="node8" class="node">
+<title>11</title>
+<ellipse fill="none" stroke="#000000" cx="253.1424" cy="-18" rx="85.2851" ry="18" />
+<text text-anchor="middle" x="253.1424" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=0.0153174726</text>
+</g>
+<!-- 5&#45;&gt;11 -->
+<g id="edge7" class="edge">
+<title>5&#45;&gt;11</title>
+<path fill="none" stroke="#0000ff" d="M402.1882,-90.6928C388.4491,-84.1124 371.9561,-76.1873 357.1424,-69 337.0215,-59.2377 314.7556,-48.3326 296.0055,-39.1199" />
+<polygon fill="#0000ff" stroke="#0000ff" points="297.3488,-35.8802 286.8305,-34.609 294.2603,-42.162 297.3488,-35.8802" />
+<text text-anchor="middle" x="392.6424" y="-57.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes, missing</text>
+</g>
+<!-- 12 -->
+<g id="node9" class="node">
+<title>12</title>
+<ellipse fill="none" stroke="#000000" cx="432.1424" cy="-18" rx="75.2868" ry="18" />
+<text text-anchor="middle" x="432.1424" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=0.03650124</text>
+</g>
+<!-- 5&#45;&gt;12 -->
+<g id="edge8" class="edge">
+<title>5&#45;&gt;12</title>
+<path fill="none" stroke="#ff0000" d="M432.1424,-86.9735C432.1424,-75.1918 432.1424,-59.5607 432.1424,-46.1581" />
+<polygon fill="#ff0000" stroke="#ff0000" points="435.6425,-46.0033 432.1424,-36.0034 428.6425,-46.0034 435.6425,-46.0033" />
+<text text-anchor="middle" x="440.1424" y="-57.8" font-family="Times,serif" font-size="14.00" fill="#000000">no</text>
+</g>
+<!-- 13 -->
+<g id="node10" class="node">
+<title>13</title>
+<ellipse fill="none" stroke="#000000" cx="616.1424" cy="-18" rx="90.1842" ry="18" />
+<text text-anchor="middle" x="616.1424" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=0.00960917864</text>
+</g>
+<!-- 6&#45;&gt;13 -->
+<g id="edge9" class="edge">
+<title>6&#45;&gt;13</title>
+<path fill="none" stroke="#0000ff" d="M616.1424,-86.9735C616.1424,-75.1918 616.1424,-59.5607 616.1424,-46.1581" />
+<polygon fill="#0000ff" stroke="#0000ff" points="619.6425,-46.0033 616.1424,-36.0034 612.6425,-46.0034 619.6425,-46.0033" />
+<text text-anchor="middle" x="625.6424" y="-57.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes</text>
+</g>
+<!-- 14 -->
+<g id="node11" class="node">
+<title>14</title>
+<ellipse fill="none" stroke="#000000" cx="813.1424" cy="-18" rx="88.2844" ry="18" />
+<text text-anchor="middle" x="813.1424" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=&#45;0.0235449504</text>
+</g>
+<!-- 6&#45;&gt;14 -->
+<g id="edge10" class="edge">
+<title>6&#45;&gt;14</title>
+<path fill="none" stroke="#ff0000" d="M652.2753,-89.0429C684.3596,-74.8736 731.4414,-54.0812 766.3878,-38.648" />
+<polygon fill="#ff0000" stroke="#ff0000" points="768.1664,-41.6887 775.9001,-34.4471 765.3385,-35.2853 768.1664,-41.6887" />
+<text text-anchor="middle" x="760.6424" y="-57.8" font-family="Times,serif" font-size="14.00" fill="#000000">no, missing</text>
+</g>
+</g>
+</svg>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xgb</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">booster</span> <span class="o">=</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_trees</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_svg output_subarea output_execute_result">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+&lt;!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"&gt;
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: %3 Pages: 1 -->
+<svg width="843pt" height="305pt" viewBox="0.00 0.00 842.53 305.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 301)">
+<title>%3</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-301 838.5346,-301 838.5346,4 -4,4" />
+<!-- 0 -->
+<g id="node1" class="node">
+<title>0</title>
+<ellipse fill="none" stroke="#000000" cx="373.1424" cy="-279" rx="76.0865" ry="18" />
+<text text-anchor="middle" x="373.1424" y="-275.3" font-family="Times,serif" font-size="14.00" fill="#000000">fare&lt;15.1729002</text>
+</g>
+<!-- 1 -->
+<g id="node2" class="node">
+<title>1</title>
+<ellipse fill="none" stroke="#000000" cx="277.1424" cy="-192" rx="46.2923" ry="18" />
+<text text-anchor="middle" x="277.1424" y="-188.3" font-family="Times,serif" font-size="14.00" fill="#000000">age&lt;16.5</text>
+</g>
+<!-- 0&#45;&gt;1 -->
+<g id="edge1" class="edge">
+<title>0&#45;&gt;1</title>
+<path fill="none" stroke="#0000ff" d="M353.7154,-261.3943C339.1195,-248.1667 318.9817,-229.9168 303.0207,-215.4522" />
+<polygon fill="#0000ff" stroke="#0000ff" points="305.3237,-212.8158 295.5634,-208.694 300.623,-218.0027 305.3237,-212.8158" />
+<text text-anchor="middle" x="366.6424" y="-231.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes, missing</text>
+</g>
+<!-- 2 -->
+<g id="node3" class="node">
+<title>2</title>
+<ellipse fill="none" stroke="#000000" cx="469.1424" cy="-192" rx="50.0912" ry="18" />
+<text text-anchor="middle" x="469.1424" y="-188.3" font-family="Times,serif" font-size="14.00" fill="#000000">pclass&lt;2.5</text>
+</g>
+<!-- 0&#45;&gt;2 -->
+<g id="edge2" class="edge">
+<title>0&#45;&gt;2</title>
+<path fill="none" stroke="#ff0000" d="M392.5695,-261.3943C407.0712,-248.2521 427.0436,-230.1521 442.9547,-215.7326" />
+<polygon fill="#ff0000" stroke="#ff0000" points="445.3381,-218.2962 450.3976,-208.9875 440.6374,-213.1092 445.3381,-218.2962" />
+<text text-anchor="middle" x="435.1424" y="-231.8" font-family="Times,serif" font-size="14.00" fill="#000000">no</text>
+</g>
+<!-- 3 -->
+<g id="node4" class="node">
+<title>3</title>
+<ellipse fill="none" stroke="#000000" cx="85.1424" cy="-105" rx="85.2851" ry="18" />
+<text text-anchor="middle" x="85.1424" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=0.0201979335</text>
+</g>
+<!-- 1&#45;&gt;3 -->
+<g id="edge3" class="edge">
+<title>1&#45;&gt;3</title>
+<path fill="none" stroke="#0000ff" d="M246.7195,-178.2146C215.4643,-164.0521 166.4447,-141.8401 130.5892,-125.5931" />
+<polygon fill="#0000ff" stroke="#0000ff" points="131.8674,-122.3298 121.3143,-121.3904 128.9783,-128.7057 131.8674,-122.3298" />
+<text text-anchor="middle" x="202.6424" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes</text>
+</g>
+<!-- 4 -->
+<g id="node5" class="node">
+<title>4</title>
+<ellipse fill="none" stroke="#000000" cx="277.1424" cy="-105" rx="88.2844" ry="18" />
+<text text-anchor="middle" x="277.1424" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=&#45;0.0140708359</text>
+</g>
+<!-- 1&#45;&gt;4 -->
+<g id="edge4" class="edge">
+<title>1&#45;&gt;4</title>
+<path fill="none" stroke="#ff0000" d="M277.1424,-173.9735C277.1424,-162.1918 277.1424,-146.5607 277.1424,-133.1581" />
+<polygon fill="#ff0000" stroke="#ff0000" points="280.6425,-133.0033 277.1424,-123.0034 273.6425,-133.0034 280.6425,-133.0033" />
+<text text-anchor="middle" x="310.6424" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">no, missing</text>
+</g>
+<!-- 5 -->
+<g id="node6" class="node">
+<title>5</title>
+<ellipse fill="none" stroke="#000000" cx="469.1424" cy="-105" rx="85.2851" ry="18" />
+<text text-anchor="middle" x="469.1424" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=0.0204214789</text>
+</g>
+<!-- 2&#45;&gt;5 -->
+<g id="edge5" class="edge">
+<title>2&#45;&gt;5</title>
+<path fill="none" stroke="#0000ff" d="M469.1424,-173.9735C469.1424,-162.1918 469.1424,-146.5607 469.1424,-133.1581" />
+<polygon fill="#0000ff" stroke="#0000ff" points="472.6425,-133.0033 469.1424,-123.0034 465.6425,-133.0034 472.6425,-133.0033" />
+<text text-anchor="middle" x="504.6424" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes, missing</text>
+</g>
+<!-- 6 -->
+<g id="node7" class="node">
+<title>6</title>
+<ellipse fill="none" stroke="#000000" cx="648.1424" cy="-105" rx="76.0865" ry="18" />
+<text text-anchor="middle" x="648.1424" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">fare&lt;23.3500004</text>
+</g>
+<!-- 2&#45;&gt;6 -->
+<g id="edge6" class="edge">
+<title>2&#45;&gt;6</title>
+<path fill="none" stroke="#ff0000" d="M499.4589,-177.5193C513.125,-170.9734 529.4587,-163.1243 544.1424,-156 564.4182,-146.1626 586.872,-135.1647 605.7114,-125.9076" />
+<polygon fill="#ff0000" stroke="#ff0000" points="607.4931,-128.9318 614.9227,-121.3786 604.4045,-122.65 607.4931,-128.9318" />
+<text text-anchor="middle" x="581.1424" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">no</text>
+</g>
+<!-- 13 -->
+<g id="node8" class="node">
+<title>13</title>
+<ellipse fill="none" stroke="#000000" cx="549.1424" cy="-18" rx="90.1842" ry="18" />
+<text text-anchor="middle" x="549.1424" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=0.00866124686</text>
+</g>
+<!-- 6&#45;&gt;13 -->
+<g id="edge7" class="edge">
+<title>6&#45;&gt;13</title>
+<path fill="none" stroke="#0000ff" d="M628.1083,-87.3943C613.3476,-74.4228 593.0909,-56.6213 576.7899,-42.2962" />
+<polygon fill="#0000ff" stroke="#0000ff" points="578.9689,-39.5517 569.1468,-35.5796 574.348,-44.8098 578.9689,-39.5517" />
+<text text-anchor="middle" x="614.6424" y="-57.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes</text>
+</g>
+<!-- 14 -->
+<g id="node9" class="node">
+<title>14</title>
+<ellipse fill="none" stroke="#000000" cx="746.1424" cy="-18" rx="88.2844" ry="18" />
+<text text-anchor="middle" x="746.1424" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=&#45;0.0212272462</text>
+</g>
+<!-- 6&#45;&gt;14 -->
+<g id="edge8" class="edge">
+<title>6&#45;&gt;14</title>
+<path fill="none" stroke="#ff0000" d="M667.9742,-87.3943C682.5858,-74.4228 702.6379,-56.6213 718.7743,-42.2962" />
+<polygon fill="#ff0000" stroke="#ff0000" points="721.1855,-44.8359 726.3402,-35.5796 716.5382,-39.6011 721.1855,-44.8359" />
+<text text-anchor="middle" x="736.6424" y="-57.8" font-family="Times,serif" font-size="14.00" fill="#000000">no, missing</text>
+</g>
+</g>
+</svg>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xgb</span><span class="o">.</span><span class="n">to_graphviz</span><span class="p">(</span><span class="n">booster</span> <span class="o">=</span> <span class="n">model</span><span class="p">,</span> <span class="n">num_trees</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_svg output_subarea output_execute_result">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+&lt;!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"&gt;
+<!-- Generated by graphviz version 2.40.1 (20161225.0304)
+ -->
+<!-- Title: %3 Pages: 1 -->
+<svg width="433pt" height="218pt" viewBox="0.00 0.00 433.13 218.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 214)">
+<title>%3</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-214 429.1344,-214 429.1344,4 -4,4" />
+<!-- 0 -->
+<g id="node1" class="node">
+<title>0</title>
+<ellipse fill="none" stroke="#000000" cx="144.1926" cy="-192" rx="76.0865" ry="18" />
+<text text-anchor="middle" x="144.1926" y="-188.3" font-family="Times,serif" font-size="14.00" fill="#000000">fare&lt;15.1729002</text>
+</g>
+<!-- 1 -->
+<g id="node2" class="node">
+<title>1</title>
+<ellipse fill="none" stroke="#000000" cx="83.1926" cy="-105" rx="83.3857" ry="18" />
+<text text-anchor="middle" x="83.1926" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=&#45;0.010894442</text>
+</g>
+<!-- 0&#45;&gt;1 -->
+<g id="edge1" class="edge">
+<title>0&#45;&gt;1</title>
+<path fill="none" stroke="#0000ff" d="M127.1383,-174.3053C122.0674,-168.6613 116.6742,-162.2531 112.1926,-156 106.8192,-148.5024 101.6184,-139.9271 97.1404,-131.9748" />
+<polygon fill="#0000ff" stroke="#0000ff" points="100.117,-130.1229 92.2488,-123.0277 93.975,-133.481 100.117,-130.1229" />
+<text text-anchor="middle" x="147.6926" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes, missing</text>
+</g>
+<!-- 2 -->
+<g id="node3" class="node">
+<title>2</title>
+<ellipse fill="none" stroke="#000000" cx="234.1926" cy="-105" rx="50.0912" ry="18" />
+<text text-anchor="middle" x="234.1926" y="-101.3" font-family="Times,serif" font-size="14.00" fill="#000000">pclass&lt;2.5</text>
+</g>
+<!-- 0&#45;&gt;2 -->
+<g id="edge2" class="edge">
+<title>0&#45;&gt;2</title>
+<path fill="none" stroke="#ff0000" d="M163.3776,-174.5727C169.7348,-168.7234 176.8138,-162.1287 183.1926,-156 192.1317,-147.4113 201.7841,-137.8383 210.2612,-129.3268" />
+<polygon fill="#ff0000" stroke="#ff0000" points="212.8019,-131.7354 217.3608,-122.1716 207.8328,-126.805 212.8019,-131.7354" />
+<text text-anchor="middle" x="205.1926" y="-144.8" font-family="Times,serif" font-size="14.00" fill="#000000">no</text>
+</g>
+<!-- 5 -->
+<g id="node4" class="node">
+<title>5</title>
+<ellipse fill="none" stroke="#000000" cx="136.1926" cy="-18" rx="85.2851" ry="18" />
+<text text-anchor="middle" x="136.1926" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=0.0183849707</text>
+</g>
+<!-- 2&#45;&gt;5 -->
+<g id="edge3" class="edge">
+<title>2&#45;&gt;5</title>
+<path fill="none" stroke="#0000ff" d="M215.2972,-88.2255C200.6708,-75.2408 180.2015,-57.0691 163.7496,-42.4638" />
+<polygon fill="#0000ff" stroke="#0000ff" points="165.8411,-39.6404 156.0391,-35.6188 161.1938,-44.8752 165.8411,-39.6404" />
+<text text-anchor="middle" x="225.6926" y="-57.8" font-family="Times,serif" font-size="14.00" fill="#000000">yes, missing</text>
+</g>
+<!-- 6 -->
+<g id="node5" class="node">
+<title>6</title>
+<ellipse fill="none" stroke="#000000" cx="332.1926" cy="-18" rx="92.8835" ry="18" />
+<text text-anchor="middle" x="332.1926" y="-14.3" font-family="Times,serif" font-size="14.00" fill="#000000">leaf=&#45;0.00472340686</text>
+</g>
+<!-- 2&#45;&gt;6 -->
+<g id="edge4" class="edge">
+<title>2&#45;&gt;6</title>
+<path fill="none" stroke="#ff0000" d="M253.088,-88.2255C267.7144,-75.2408 288.1838,-57.0691 304.6357,-42.4638" />
+<polygon fill="#ff0000" stroke="#ff0000" points="307.1914,-44.8752 312.3461,-35.6188 302.5442,-39.6404 307.1914,-44.8752" />
+<text text-anchor="middle" x="296.1926" y="-57.8" font-family="Times,serif" font-size="14.00" fill="#000000">no</text>
+</g>
+</g>
+</svg>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_dump</span><span class="p">()))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0:[fare&lt;15.1729002] yes=1,no=2,missing=1
+	1:[age&lt;16.5] yes=3,no=4,missing=4
+		3:leaf=0.0223644935
+		4:leaf=-0.0156309232
+	2:[pclass&lt;2.5] yes=5,no=6,missing=5
+		5:[parch&lt;0.5] yes=11,no=12,missing=11
+			11:leaf=0.0153174726
+			12:leaf=0.03650124
+		6:[fare&lt;23.3500004] yes=13,no=14,missing=14
+			13:leaf=0.00960917864
+			14:leaf=-0.0235449504
+
+0:[fare&lt;15.1729002] yes=1,no=2,missing=1
+	1:[age&lt;16.5] yes=3,no=4,missing=4
+		3:leaf=0.0201979335
+		4:leaf=-0.0140708359
+	2:[pclass&lt;2.5] yes=5,no=6,missing=5
+		5:leaf=0.0204214789
+		6:[fare&lt;23.3500004] yes=13,no=14,missing=14
+			13:leaf=0.00866124686
+			14:leaf=-0.0212272462
+
+0:[fare&lt;15.1729002] yes=1,no=2,missing=1
+	1:leaf=-0.010894442
+	2:[pclass&lt;2.5] yes=5,no=6,missing=5
+		5:leaf=0.0183849707
+		6:leaf=-0.00472340686
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Convert-dump-string-to-a-.py-file">Convert dump string to a .py file<a class="anchor-link" href="#Convert-dump-string-to-a-.py-file"> </a></h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">string_parser</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;:leaf=&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">out</span>  <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\w.-]+&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="n">tabs</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\t]+&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="n">out</span><span class="p">[</span><span class="mi">8</span><span class="p">]):</span>
+            <span class="n">missing_value_handling</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot; or np.isnan(x[&#39;&quot;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;&#39;]) &quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">missing_value_handling</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tabs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\t]+&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;    &#39;</span><span class="p">)</span> <span class="o">+</span> 
+                    <span class="s1">&#39;        if state == &#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\t]+&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;    &#39;</span><span class="p">)</span> <span class="o">+</span>
+                    <span class="s1">&#39;            state = (&#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span>  
+                    <span class="s1">&#39; if &#39;</span> <span class="o">+</span>  <span class="s2">&quot;x[&#39;&quot;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span><span class="s2">&quot;&#39;]&lt;&quot;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">missing_value_handling</span> <span class="o">+</span> 
+                    <span class="s1">&#39; else &#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;        if state == &#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                    <span class="s1">&#39;            state = (&#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span>  
+                    <span class="s1">&#39; if &#39;</span> <span class="o">+</span>  <span class="s2">&quot;x[&#39;&quot;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span><span class="s2">&quot;&#39;]&lt;&quot;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">missing_value_handling</span> <span class="o">+</span>
+                    <span class="s1">&#39; else &#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\d.-]+&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\t]+&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;    &#39;</span><span class="p">)</span> <span class="o">+</span> 
+                <span class="s1">&#39;        if state == &#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:</span><span class="se">\n</span><span class="s1">    &#39;</span> <span class="o">+</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\t]+&quot;</span><span class="p">,</span> <span class="n">s</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;    &#39;</span><span class="p">)</span> <span class="o">+</span> 
+                <span class="s1">&#39;        return &#39;</span> <span class="o">+</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        
+<span class="k">def</span> <span class="nf">tree_parser</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;    if num_booster == 0:</span><span class="se">\n</span><span class="s1">        state = 0</span><span class="se">\n</span><span class="s1">&#39;</span>
+             <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">string_parser</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span><span class="o">-</span><span class="mi">1</span><span class="p">)]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;    elif num_booster == &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;:</span><span class="se">\n</span><span class="s1">        state = 0</span><span class="se">\n</span><span class="s1">&#39;</span>
+             <span class="o">+</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">string_parser</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span><span class="o">-</span><span class="mi">1</span><span class="p">)]))</span> 
+    
+<span class="k">def</span> <span class="nf">model_to_py</span><span class="p">(</span><span class="n">base_score</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">out_file</span><span class="p">):</span>
+    <span class="n">trees</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_dump</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;import numpy as np</span><span class="se">\n\n</span><span class="s2">&quot;</span> 
+             <span class="o">+</span><span class="s2">&quot;def xgb_tree(x, num_booster):</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">)):</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tree_parser</span><span class="p">(</span><span class="n">trees</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">i</span><span class="p">))</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">the_file</span><span class="p">:</span>
+        <span class="n">the_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">def xgb_predict(x):</span><span class="se">\n</span><span class="s2">    predict = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">base_score</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                 <span class="o">+</span> <span class="s2">&quot;# initialize prediction with base score</span><span class="se">\n</span><span class="s2">&quot;</span> 
+                 <span class="o">+</span> <span class="s2">&quot;    for i in range(&quot;</span> 
+                 <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trees</span><span class="p">))</span>  
+                 <span class="o">+</span> <span class="s2">&quot;):</span><span class="se">\n</span><span class="s2">        predict = predict + xgb_tree(x, i)&quot;</span>
+                 <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">    return predict&quot;</span><span class="p">)</span>
+
+<span class="n">model_to_py</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;base_score&#39;</span><span class="p">],</span> <span class="n">model</span><span class="p">,</span> <span class="s1">&#39;xgb_model.py&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Prediction-using-dump-file">Prediction using dump file<a class="anchor-link" href="#Prediction-using-dump-file"> </a></h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">xgb_model</span>
+
+<span class="n">passenger_data_1</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pclass&#39;</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="s1">&#39;sibsp&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;parch&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">:</span><span class="mf">7.8958</span><span class="p">}</span>
+<span class="n">passenger_data_2</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pclass&#39;</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span><span class="mi">46</span><span class="p">,</span> <span class="s1">&#39;sibsp&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;parch&#39;</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;fare&#39;</span><span class="p">:</span><span class="mi">26</span><span class="p">}</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">xgb_model</span><span class="o">.</span><span class="n">xgb_predict</span><span class="p">(</span><span class="n">passenger_data_1</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">xgb_model</span><span class="o">.</span><span class="n">xgb_predict</span><span class="p">(</span><span class="n">passenger_data_2</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0.34144773395253103
+0.43616785725253104
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="joaorafaelm/notebook"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+</script>
+<a class="u-url" href="/notebook/xgboost/2021/06/05/_deploying_xgboost_model.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/notebook/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/notebook/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/notebook/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/joaorafaelm" title="joaorafaelm"><svg class="svg-icon grey"><use xlink:href="/notebook/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
