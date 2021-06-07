@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Multilanguage topic modeling with BERT | 📝</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Multilanguage topic modeling with BERT" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://joaorafaelm.github.io/notebook/bert/topics/nlp/2021/04/17/multilang-topic-model.html" />
+<meta property="og:url" content="https://joaorafaelm.github.io/notebook/bert/topics/nlp/2021/04/17/multilang-topic-model.html" />
+<meta property="og:site_name" content="📝" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-04-17T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://joaorafaelm.github.io/notebook/bert/topics/nlp/2021/04/17/multilang-topic-model.html","@type":"BlogPosting","headline":"Multilanguage topic modeling with BERT","dateModified":"2021-04-17T00:00:00-05:00","datePublished":"2021-04-17T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://joaorafaelm.github.io/notebook/bert/topics/nlp/2021/04/17/multilang-topic-model.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/notebook/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://joaorafaelm.github.io/notebook/feed.xml" title="📝" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-104187041-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-104187041-1');
+</script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/notebook/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/notebook/">📝</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/notebook/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Multilanguage topic modeling with BERT</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-04-17T00:00:00-05:00" itemprop="datePublished">
+        Apr 17, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      6 min read
+    
+</span>
+      <span class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/notebook/categories/#BERT">BERT</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/notebook/categories/#topics">topics</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/notebook/categories/#nlp">nlp</a>
+        
+      
+      </span>
+    
+
+    </p>
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-left badges">
+          <div class="px-2">
+
+    <a href="https://github.com/joaorafaelm/notebook/tree/master/_notebooks/2021-04-17-multilang-topic-model.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/notebook/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/joaorafaelm/notebook/blob/master/_notebooks/2021-04-17-multilang-topic-model.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/notebook/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-04-17-multilang-topic-model.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>pip install contextualized_topic_models
+<span class="o">!</span>pip uninstall transformers -y
+<span class="o">!</span>pip install <span class="nv">transformers</span><span class="o">==</span><span class="m">3</span>.0.2
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Requirement already satisfied: contextualized_topic_models in /usr/local/lib/python3.6/dist-packages (1.4.2)
+Requirement already satisfied: torchvision==0.7.0 in /usr/local/lib/python3.6/dist-packages (from contextualized_topic_models) (0.7.0+cu101)
+Requirement already satisfied: gensim==3.8.3 in /usr/local/lib/python3.6/dist-packages (from contextualized_topic_models) (3.8.3)
+Requirement already satisfied: wheel==0.33.6 in /usr/local/lib/python3.6/dist-packages (from contextualized_topic_models) (0.33.6)
+Requirement already satisfied: pytest-runner==5.1 in /usr/local/lib/python3.6/dist-packages (from contextualized_topic_models) (5.1)
+Requirement already satisfied: pytest==4.6.5 in /usr/local/lib/python3.6/dist-packages (from contextualized_topic_models) (4.6.5)
+Requirement already satisfied: numpy==1.19.1 in /usr/local/lib/python3.6/dist-packages (from contextualized_topic_models) (1.19.1)
+Requirement already satisfied: sentence-transformers==0.3.2 in /usr/local/lib/python3.6/dist-packages (from contextualized_topic_models) (0.3.2)
+Requirement already satisfied: torch==1.6.0 in /usr/local/lib/python3.6/dist-packages (from contextualized_topic_models) (1.6.0)
+Requirement already satisfied: pillow&gt;=4.1.1 in /usr/local/lib/python3.6/dist-packages (from torchvision==0.7.0-&gt;contextualized_topic_models) (7.0.0)
+Requirement already satisfied: six&gt;=1.5.0 in /usr/local/lib/python3.6/dist-packages (from gensim==3.8.3-&gt;contextualized_topic_models) (1.15.0)
+Requirement already satisfied: scipy&gt;=0.18.1 in /usr/local/lib/python3.6/dist-packages (from gensim==3.8.3-&gt;contextualized_topic_models) (1.4.1)
+Requirement already satisfied: smart-open&gt;=1.8.1 in /usr/local/lib/python3.6/dist-packages (from gensim==3.8.3-&gt;contextualized_topic_models) (2.1.0)
+Requirement already satisfied: importlib-metadata&gt;=0.12 in /usr/local/lib/python3.6/dist-packages (from pytest==4.6.5-&gt;contextualized_topic_models) (1.7.0)
+Requirement already satisfied: more-itertools&gt;=4.0.0; python_version &gt; &#34;2.7&#34; in /usr/local/lib/python3.6/dist-packages (from pytest==4.6.5-&gt;contextualized_topic_models) (8.4.0)
+Requirement already satisfied: atomicwrites&gt;=1.0 in /usr/local/lib/python3.6/dist-packages (from pytest==4.6.5-&gt;contextualized_topic_models) (1.4.0)
+Requirement already satisfied: py&gt;=1.5.0 in /usr/local/lib/python3.6/dist-packages (from pytest==4.6.5-&gt;contextualized_topic_models) (1.9.0)
+Requirement already satisfied: pluggy&lt;1.0,&gt;=0.12 in /usr/local/lib/python3.6/dist-packages (from pytest==4.6.5-&gt;contextualized_topic_models) (0.13.1)
+Requirement already satisfied: attrs&gt;=17.4.0 in /usr/local/lib/python3.6/dist-packages (from pytest==4.6.5-&gt;contextualized_topic_models) (20.1.0)
+Requirement already satisfied: packaging in /usr/local/lib/python3.6/dist-packages (from pytest==4.6.5-&gt;contextualized_topic_models) (20.4)
+Requirement already satisfied: wcwidth in /usr/local/lib/python3.6/dist-packages (from pytest==4.6.5-&gt;contextualized_topic_models) (0.2.5)
+Requirement already satisfied: scikit-learn in /usr/local/lib/python3.6/dist-packages (from sentence-transformers==0.3.2-&gt;contextualized_topic_models) (0.22.2.post1)
+Requirement already satisfied: tqdm in /usr/local/lib/python3.6/dist-packages (from sentence-transformers==0.3.2-&gt;contextualized_topic_models) (4.41.1)
+Requirement already satisfied: transformers&gt;=3.0.2 in /usr/local/lib/python3.6/dist-packages (from sentence-transformers==0.3.2-&gt;contextualized_topic_models) (3.1.0)
+Requirement already satisfied: nltk in /usr/local/lib/python3.6/dist-packages (from sentence-transformers==0.3.2-&gt;contextualized_topic_models) (3.2.5)
+Requirement already satisfied: future in /usr/local/lib/python3.6/dist-packages (from torch==1.6.0-&gt;contextualized_topic_models) (0.16.0)
+Requirement already satisfied: boto in /usr/local/lib/python3.6/dist-packages (from smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (2.49.0)
+Requirement already satisfied: requests in /usr/local/lib/python3.6/dist-packages (from smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (2.23.0)
+Requirement already satisfied: boto3 in /usr/local/lib/python3.6/dist-packages (from smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (1.14.48)
+Requirement already satisfied: zipp&gt;=0.5 in /usr/local/lib/python3.6/dist-packages (from importlib-metadata&gt;=0.12-&gt;pytest==4.6.5-&gt;contextualized_topic_models) (3.1.0)
+Requirement already satisfied: pyparsing&gt;=2.0.2 in /usr/local/lib/python3.6/dist-packages (from packaging-&gt;pytest==4.6.5-&gt;contextualized_topic_models) (2.4.7)
+Requirement already satisfied: joblib&gt;=0.11 in /usr/local/lib/python3.6/dist-packages (from scikit-learn-&gt;sentence-transformers==0.3.2-&gt;contextualized_topic_models) (0.16.0)
+Requirement already satisfied: sacremoses in /usr/local/lib/python3.6/dist-packages (from transformers&gt;=3.0.2-&gt;sentence-transformers==0.3.2-&gt;contextualized_topic_models) (0.0.43)
+Requirement already satisfied: tokenizers==0.8.1.rc2 in /usr/local/lib/python3.6/dist-packages (from transformers&gt;=3.0.2-&gt;sentence-transformers==0.3.2-&gt;contextualized_topic_models) (0.8.1rc2)
+Requirement already satisfied: filelock in /usr/local/lib/python3.6/dist-packages (from transformers&gt;=3.0.2-&gt;sentence-transformers==0.3.2-&gt;contextualized_topic_models) (3.0.12)
+Requirement already satisfied: dataclasses; python_version &lt; &#34;3.7&#34; in /usr/local/lib/python3.6/dist-packages (from transformers&gt;=3.0.2-&gt;sentence-transformers==0.3.2-&gt;contextualized_topic_models) (0.7)
+Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.6/dist-packages (from transformers&gt;=3.0.2-&gt;sentence-transformers==0.3.2-&gt;contextualized_topic_models) (2019.12.20)
+Requirement already satisfied: sentencepiece!=0.1.92 in /usr/local/lib/python3.6/dist-packages (from transformers&gt;=3.0.2-&gt;sentence-transformers==0.3.2-&gt;contextualized_topic_models) (0.1.91)
+Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,&lt;1.26,&gt;=1.21.1 in /usr/local/lib/python3.6/dist-packages (from requests-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (1.24.3)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.6/dist-packages (from requests-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (2020.6.20)
+Requirement already satisfied: idna&lt;3,&gt;=2.5 in /usr/local/lib/python3.6/dist-packages (from requests-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (2.10)
+Requirement already satisfied: chardet&lt;4,&gt;=3.0.2 in /usr/local/lib/python3.6/dist-packages (from requests-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (3.0.4)
+Requirement already satisfied: jmespath&lt;1.0.0,&gt;=0.7.1 in /usr/local/lib/python3.6/dist-packages (from boto3-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (0.10.0)
+Requirement already satisfied: s3transfer&lt;0.4.0,&gt;=0.3.0 in /usr/local/lib/python3.6/dist-packages (from boto3-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (0.3.3)
+Requirement already satisfied: botocore&lt;1.18.0,&gt;=1.17.48 in /usr/local/lib/python3.6/dist-packages (from boto3-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (1.17.48)
+Requirement already satisfied: click in /usr/local/lib/python3.6/dist-packages (from sacremoses-&gt;transformers&gt;=3.0.2-&gt;sentence-transformers==0.3.2-&gt;contextualized_topic_models) (7.1.2)
+Requirement already satisfied: docutils&lt;0.16,&gt;=0.10 in /usr/local/lib/python3.6/dist-packages (from botocore&lt;1.18.0,&gt;=1.17.48-&gt;boto3-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (0.15.2)
+Requirement already satisfied: python-dateutil&lt;3.0.0,&gt;=2.1 in /usr/local/lib/python3.6/dist-packages (from botocore&lt;1.18.0,&gt;=1.17.48-&gt;boto3-&gt;smart-open&gt;=1.8.1-&gt;gensim==3.8.3-&gt;contextualized_topic_models) (2.8.1)
+Uninstalling transformers-3.1.0:
+  Successfully uninstalled transformers-3.1.0
+Collecting transformers==3.0.2
+  Downloading https://files.pythonhosted.org/packages/27/3c/91ed8f5c4e7ef3227b4119200fc0ed4b4fd965b1f0172021c25701087825/transformers-3.0.2-py3-none-any.whl (769kB)
+     |████████████████████████████████| 778kB 3.4MB/s 
+Requirement already satisfied: sacremoses in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (0.0.43)
+Requirement already satisfied: filelock in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (3.0.12)
+Requirement already satisfied: dataclasses; python_version &lt; &#34;3.7&#34; in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (0.7)
+Requirement already satisfied: packaging in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (20.4)
+Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (2019.12.20)
+Requirement already satisfied: requests in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (2.23.0)
+Requirement already satisfied: numpy in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (1.19.1)
+Collecting tokenizers==0.8.1.rc1
+  Downloading https://files.pythonhosted.org/packages/40/d0/30d5f8d221a0ed981a186c8eb986ce1c94e3a6e87f994eae9f4aa5250217/tokenizers-0.8.1rc1-cp36-cp36m-manylinux1_x86_64.whl (3.0MB)
+     |████████████████████████████████| 3.0MB 17.9MB/s 
+Requirement already satisfied: sentencepiece!=0.1.92 in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (0.1.91)
+Requirement already satisfied: tqdm&gt;=4.27 in /usr/local/lib/python3.6/dist-packages (from transformers==3.0.2) (4.41.1)
+Requirement already satisfied: joblib in /usr/local/lib/python3.6/dist-packages (from sacremoses-&gt;transformers==3.0.2) (0.16.0)
+Requirement already satisfied: click in /usr/local/lib/python3.6/dist-packages (from sacremoses-&gt;transformers==3.0.2) (7.1.2)
+Requirement already satisfied: six in /usr/local/lib/python3.6/dist-packages (from sacremoses-&gt;transformers==3.0.2) (1.15.0)
+Requirement already satisfied: pyparsing&gt;=2.0.2 in /usr/local/lib/python3.6/dist-packages (from packaging-&gt;transformers==3.0.2) (2.4.7)
+Requirement already satisfied: idna&lt;3,&gt;=2.5 in /usr/local/lib/python3.6/dist-packages (from requests-&gt;transformers==3.0.2) (2.10)
+Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,&lt;1.26,&gt;=1.21.1 in /usr/local/lib/python3.6/dist-packages (from requests-&gt;transformers==3.0.2) (1.24.3)
+Requirement already satisfied: chardet&lt;4,&gt;=3.0.2 in /usr/local/lib/python3.6/dist-packages (from requests-&gt;transformers==3.0.2) (3.0.4)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.6/dist-packages (from requests-&gt;transformers==3.0.2) (2020.6.20)
+Installing collected packages: tokenizers, transformers
+  Found existing installation: tokenizers 0.8.1rc2
+    Uninstalling tokenizers-0.8.1rc2:
+      Successfully uninstalled tokenizers-0.8.1rc2
+Successfully installed tokenizers-0.8.1rc1 transformers-3.0.2
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">contextualized_topic_models.models.ctm</span> <span class="kn">import</span> <span class="n">CTM</span>
+<span class="kn">from</span> <span class="nn">contextualized_topic_models.utils.data_preparation</span> <span class="kn">import</span> <span class="n">bert_embeddings_from_file</span><span class="p">,</span> <span class="n">bert_embeddings_from_list</span>
+<span class="kn">from</span> <span class="nn">contextualized_topic_models.datasets.dataset</span> <span class="kn">import</span> <span class="n">CTMDataset</span>
+<span class="kn">from</span> <span class="nn">contextualized_topic_models.utils.data_preparation</span> <span class="kn">import</span> <span class="n">TextHandler</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>curl -s https://raw.githubusercontent.com/MilaNLProc/contextualized-topic-models/master/contextualized_topic_models/data/gnews/GoogleNews.txt <span class="p">|</span> head -n1000 &gt; googlenews.txt
+<span class="o">!</span>head googlenews.txt
+<span class="o">!</span>cat googlenews.txt <span class="p">|</span> wc -l
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>centrepoint winter white gala london
+mourinho seek killer instinct
+roundup golden globe won seduced johansson voice
+travel disruption mount storm cold air sweep south florida
+wes welker blame costly turnover
+psalm book fetch record ny auction ktvn channel reno
+surface review comparison window powered tablet pitted
+scientist unreported fish trap space
+nokia lumia launch
+edward snowden latest leak nsa monitored online porn habit radicalizers
+1000
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Load-The-Data">Load The Data<a class="anchor-link" href="#Load-The-Data"> </a></h3>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;googlenews.txt&quot;</span>
+<span class="n">handler</span> <span class="o">=</span> <span class="n">TextHandler</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">prepare</span><span class="p">()</span> <span class="c1"># create vocabulary and training data </span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_bert</span> <span class="o">=</span> <span class="n">bert_embeddings_from_file</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;distiluse-base-multilingual-cased&quot;</span><span class="p">)</span>
+<span class="n">training_dataset</span> <span class="o">=</span> <span class="n">CTMDataset</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">bow</span><span class="p">,</span> <span class="n">train_bert</span><span class="p">,</span> <span class="n">handler</span><span class="o">.</span><span class="n">idx2token</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Train-the-Fully-Contextualized-Topic-Model">Train the Fully Contextualized Topic Model<a class="anchor-link" href="#Train-the-Fully-Contextualized-Topic-Model"> </a></h3>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">num_topics</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">ctm</span> <span class="o">=</span> <span class="n">CTM</span><span class="p">(</span><span class="n">input_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">vocab</span><span class="p">),</span> <span class="n">bert_input_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">num_epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">hidden_sizes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="p">),</span>
+            <span class="n">inference_type</span><span class="o">=</span><span class="s2">&quot;contextual&quot;</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="n">num_topics</span><span class="p">,</span> <span class="n">num_data_loader_workers</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">ctm</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">training_dataset</span><span class="p">)</span> <span class="c1"># run the model</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ctm</span><span class="o">.</span><span class="n">get_topic_lists</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># get the top-5 words lists</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[[&#39;kim&#39;, &#39;west&#39;, &#39;kanye&#39;, &#39;kardashian&#39;, &#39;bound&#39;],
+ [&#39;day&#39;, &#39;thanksgiving&#39;, &#39;parade&#39;, &#39;macy&#39;, &#39;packer&#39;],
+ [&#39;patriot&#39;, &#39;bronco&#39;, &#39;pat&#39;, &#39;packer&#39;, &#39;loss&#39;],
+ [&#39;xbox&#39;, &#39;microsoft&#39;, &#39;p&#39;, &#39;game&#39;, &#39;console&#39;],
+ [&#39;government&#39;, &#39;political&#39;, &#39;thai&#39;, &#39;party&#39;, &#39;protest&#39;],
+ [&#39;oldboy&#39;, &#39;brolin&#39;, &#39;josh&#39;, &#39;lee&#39;, &#39;spike&#39;],
+ [&#39;google&#39;, &#39;chrome&#39;, &#39;search&#39;, &#39;extension&#39;, &#39;voice&#39;],
+ [&#39;johansson&#39;, &#39;globe&#39;, &#39;golden&#39;, &#39;scarlett&#39;, &#39;ineligible&#39;],
+ [&#39;star&#39;, &#39;dancing&#39;, &#39;amber&#39;, &#39;riley&#39;, &#39;win&#39;],
+ [&#39;police&#39;, &#39;guilty&#39;, &#39;watkins&#39;, &#39;case&#39;, &#39;lostprophets&#39;],
+ [&#39;san&#39;, &#39;andreas&#39;, &#39;gta&#39;, &#39;mobile&#39;, &#39;android&#39;],
+ [&#39;flat&#39;, &#39;future&#39;, &#39;record&#39;, &#39;level&#39;, &#39;p&#39;],
+ [&#39;thanksgiving&#39;, &#39;day&#39;, &#39;parade&#39;, &#39;thanksgivukkah&#39;, &#39;holiday&#39;],
+ [&#39;jos&#39;, &#39;wearhouse&#39;, &#39;men&#39;, &#39;bank&#39;, &#39;baldwin&#39;],
+ [&#39;prince&#39;, &#39;william&#39;, &#39;swift&#39;, &#39;jovi&#39;, &#39;bon&#39;],
+ [&#39;porn&#39;, &#39;nsa&#39;, &#39;habit&#39;, &#39;radicalizers&#39;, &#39;spying&#39;],
+ [&#39;pope&#39;, &#39;church&#39;, &#39;putin&#39;, &#39;issue&#39;, &#39;coalition&#39;],
+ [&#39;report&#39;, &#39;benghazi&#39;, &#39;security&#39;, &#39;baldwin&#39;, &#39;alec&#39;],
+ [&#39;china&#39;, &#39;zone&#39;, &#39;flight&#39;, &#39;airspace&#39;, &#39;disputed&#39;],
+ [&#39;storm&#39;, &#39;parade&#39;, &#39;macy&#39;, &#39;balloon&#39;, &#39;travel&#39;],
+ [&#39;bank&#39;, &#39;men&#39;, &#39;palestinian&#39;, &#39;jos&#39;, &#39;wearhouse&#39;],
+ [&#39;review&#39;, &#39;homefront&#39;, &#39;frozen&#39;, &#39;inch&#39;, &#39;oldboy&#39;],
+ [&#39;bronco&#39;, &#39;packer&#39;, &#39;seahawks&#39;, &#39;rodgers&#39;, &#39;patriot&#39;],
+ [&#39;frozen&#39;, &#39;heart&#39;, &#39;review&#39;, &#39;homefront&#39;, &#39;detroit&#39;],
+ [&#39;hiv&#39;, &#39;meningitis&#39;, &#39;flu&#39;, &#39;greece&#39;, &#39;health&#39;],
+ [&#39;black&#39;, &#39;friday&#39;, &#39;nativity&#39;, &#39;deal&#39;, &#39;monday&#39;],
+ [&#39;aarushi&#39;, &#39;hiv&#39;, &#39;killing&#39;, &#39;teen&#39;, &#39;murder&#39;],
+ [&#39;west&#39;, &#39;kanye&#39;, &#39;kim&#39;, &#39;seth&#39;, &#39;bound&#39;],
+ [&#39;cb&#39;, &#39;seahawks&#39;, &#39;dallas&#39;, &#39;chelsea&#39;, &#39;browner&#39;],
+ [&#39;hp&#39;, &#39;revenue&#39;, &#39;raise&#39;, &#39;week&#39;, &#39;shopping&#39;],
+ [&#39;lumia&#39;, &#39;nokia&#39;, &#39;price&#39;, &#39;power&#39;, &#39;uk&#39;],
+ [&#39;typhoon&#39;, &#39;philippine&#39;, &#39;haiyan&#39;, &#39;climate&#39;, &#39;gain&#39;],
+ [&#39;african&#39;, &#39;france&#39;, &#39;central&#39;, &#39;republic&#39;, &#39;troop&#39;],
+ [&#39;parade&#39;, &#39;macy&#39;, &#39;carlos&#39;, &#39;beltran&#39;, &#39;york&#39;],
+ [&#39;kim&#39;, &#39;kardashian&#39;, &#39;video&#39;, &#39;west&#39;, &#39;bound&#39;],
+ [&#39;hewitt&#39;, &#39;love&#39;, &#39;star&#39;, &#39;jennifer&#39;, &#39;dancing&#39;],
+ [&#39;swift&#39;, &#39;william&#39;, &#39;taylor&#39;, &#39;prince&#39;, &#39;jovi&#39;],
+ [&#39;launch&#39;, &#39;microsoft&#39;, &#39;chrome&#39;, &#39;google&#39;, &#39;search&#39;],
+ [&#39;pakistan&#39;, &#39;army&#39;, &#39;chief&#39;, &#39;sharif&#39;, &#39;pm&#39;],
+ [&#39;air&#39;, &#39;china&#39;, &#39;zone&#39;, &#39;sea&#39;, &#39;disputed&#39;],
+ [&#39;west&#39;, &#39;kanye&#39;, &#39;bound&#39;, &#39;kim&#39;, &#39;video&#39;],
+ [&#39;ison&#39;, &#39;comet&#39;, &#39;raptor&#39;, &#39;sun&#39;, &#39;bonobo&#39;],
+ [&#39;irs&#39;, &#39;google&#39;, &#39;tax&#39;, &#39;group&#39;, &#39;glass&#39;],
+ [&#39;net&#39;, &#39;review&#39;, &#39;preview&#39;, &#39;disney&#39;, &#39;movie&#39;],
+ [&#39;nokia&#39;, &#39;lumia&#39;, &#39;tablet&#39;, &#39;window&#39;, &#39;moto&#39;],
+ [&#39;three&#39;, &#39;seahawks&#39;, &#39;year&#39;, &#39;burning&#39;, &#39;officer&#39;],
+ [&#39;report&#39;, &#39;burning&#39;, &#39;officer&#39;, &#39;storm&#39;, &#39;truck&#39;],
+ [&#39;girl&#39;, &#39;baby&#39;, &#39;guilty&#39;, &#39;lostprophets&#39;, &#39;hewitt&#39;],
+ [&#39;black&#39;, &#39;friday&#39;, &#39;sale&#39;, &#39;deal&#39;, &#39;monday&#39;],
+ [&#39;heart&#39;, &#39;woman&#39;, &#39;pill&#39;, &#39;frozen&#39;, &#39;crisis&#39;]]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>tail -n <span class="m">5</span> googlenews.txt &gt; test.txt
+<span class="o">!</span>cat test.txt
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>ray whitney return will dallas star huge boost offensively
+s relied intermediary probe spacex sept upper stage
+nokia lumia tablet kill surface
+lakers net preview
+neighbor helped save girl imprisoned year speaks
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_handler</span> <span class="o">=</span> <span class="n">TextHandler</span><span class="p">(</span><span class="s2">&quot;test.txt&quot;</span><span class="p">)</span>
+<span class="n">test_handler</span><span class="o">.</span><span class="n">prepare</span><span class="p">()</span> <span class="c1"># create vocabulary and training data</span>
+
+<span class="c1"># generate BERT data</span>
+<span class="n">testing_bert</span> <span class="o">=</span> <span class="n">bert_embeddings_from_file</span><span class="p">(</span><span class="s2">&quot;test.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;distiluse-base-multilingual-cased&quot;</span><span class="p">)</span>
+<span class="n">testing_dataset</span> <span class="o">=</span> <span class="n">CTMDataset</span><span class="p">(</span><span class="n">test_handler</span><span class="o">.</span><span class="n">bow</span><span class="p">,</span> <span class="n">testing_bert</span><span class="p">,</span> <span class="n">test_handler</span><span class="o">.</span><span class="n">idx2token</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># we sample n times and average to get a more accurate estimate of the document-topic distribution</span>
+<span class="n">predicted_topics</span> <span class="o">=</span> <span class="p">[]</span> 
+<span class="n">thetas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">testing_dataset</span><span class="p">),</span> <span class="n">num_topics</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="n">thetas</span> <span class="o">=</span> <span class="n">thetas</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ctm</span><span class="o">.</span><span class="n">get_thetas</span><span class="p">(</span><span class="n">testing_dataset</span><span class="p">))</span>
+    
+<span class="k">for</span> <span class="n">idd</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">testing_dataset</span><span class="p">)):</span>
+    
+    <span class="n">thetas</span><span class="p">[</span><span class="n">idd</span><span class="p">]</span> <span class="o">=</span> <span class="n">thetas</span><span class="p">[</span><span class="n">idd</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">thetas</span><span class="p">[</span><span class="n">idd</span><span class="p">])</span>
+    <span class="n">predicted_topic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">thetas</span><span class="p">[</span><span class="n">idd</span><span class="p">])</span> 
+    <span class="n">predicted_topics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted_topic</span><span class="p">)</span>
+
+<span class="c1"># document-topic distribution , list of the topic predicted for each testing document</span>
+<span class="c1"># thetas, </span>
+<span class="n">predicted_topics</span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[22, 41, 44, 23, 47]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_handler</span><span class="o">.</span><span class="n">load_text_file</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#39;s relied intermediary probe spacex sept upper stage\n&#39;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ctm</span><span class="o">.</span><span class="n">get_topic_lists</span><span class="p">(</span><span class="mi">20</span><span class="p">)[</span><span class="mi">41</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[&#39;ison&#39;,
+ &#39;comet&#39;,
+ &#39;raptor&#39;,
+ &#39;sun&#39;,
+ &#39;bonobo&#39;,
+ &#39;dna&#39;,
+ &#39;flying&#39;,
+ &#39;trouble&#39;,
+ &#39;stereo&#39;,
+ &#39;seahorse&#39;,
+ &#39;researcher&#39;,
+ &#39;preview&#39;,
+ &#39;spacecraft&#39;,
+ &#39;century&#39;,
+ &#39;jellyfish&#39;,
+ &#39;testing&#39;,
+ &#39;minute&#39;,
+ &#39;net&#39;,
+ &#39;spectacular&#39;,
+ &#39;congo&#39;]</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="joaorafaelm/notebook"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+</script>
+<a class="u-url" href="/notebook/bert/topics/nlp/2021/04/17/multilang-topic-model.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/notebook/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/notebook/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/notebook/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/joaorafaelm" title="joaorafaelm"><svg class="svg-icon grey"><use xlink:href="/notebook/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
