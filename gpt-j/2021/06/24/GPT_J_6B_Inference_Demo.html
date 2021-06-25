@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>GPT-J-6B Inference Demo | 📝</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="GPT-J-6B Inference Demo" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://joaorafaelm.github.io/notebook/gpt-j/2021/06/24/GPT_J_6B_Inference_Demo.html" />
+<meta property="og:url" content="https://joaorafaelm.github.io/notebook/gpt-j/2021/06/24/GPT_J_6B_Inference_Demo.html" />
+<meta property="og:site_name" content="📝" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-06-24T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://joaorafaelm.github.io/notebook/gpt-j/2021/06/24/GPT_J_6B_Inference_Demo.html","@type":"BlogPosting","headline":"GPT-J-6B Inference Demo","dateModified":"2021-06-24T00:00:00-05:00","datePublished":"2021-06-24T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://joaorafaelm.github.io/notebook/gpt-j/2021/06/24/GPT_J_6B_Inference_Demo.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/notebook/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://joaorafaelm.github.io/notebook/feed.xml" title="📝" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-104187041-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-104187041-1');
+</script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/notebook/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/notebook/">📝</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/notebook/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">GPT-J-6B Inference Demo</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-06-24T00:00:00-05:00" itemprop="datePublished">
+        Jun 24, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      21 min read
+    
+</span>
+      <span class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/notebook/categories/#gpt-j">gpt-j</a>
+        
+      
+      </span>
+    
+
+    </p>
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-left badges">
+          <div class="px-2">
+
+    <a href="https://github.com/joaorafaelm/notebook/tree/master/_notebooks/2021-06-24-GPT_J_6B_Inference_Demo.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/notebook/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/joaorafaelm/notebook/blob/master/_notebooks/2021-06-24-GPT_J_6B_Inference_Demo.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/notebook/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-06-24-GPT_J_6B_Inference_Demo.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Install-Dependencies">Install Dependencies<a class="anchor-link" href="#Install-Dependencies"> </a></h2><p>First we download the model and install some dependencies. This step takes at least 5 minutes (possibly longer depending on server load).</p>
+<p><strong>Make sure you are using a TPU runtime!</strong></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="err">!</span><span class="n">apt</span> <span class="n">install</span> <span class="n">zstd</span>
+
+<span class="c1"># the &quot;slim&quot; version contain only bf16 weights and no optimizer parameters, which minimizes bandwidth and memory</span>
+<span class="err">!</span><span class="n">time</span> <span class="n">wget</span> <span class="o">-</span><span class="n">c</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">the</span><span class="o">-</span><span class="n">eye</span><span class="o">.</span><span class="n">eu</span><span class="o">/</span><span class="n">public</span><span class="o">/</span><span class="n">AI</span><span class="o">/</span><span class="n">GPT</span><span class="o">-</span><span class="n">J</span><span class="o">-</span><span class="mi">6</span><span class="n">B</span><span class="o">/</span><span class="n">step_383500_slim</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">zstd</span>
+
+<span class="err">!</span><span class="n">time</span> <span class="n">tar</span> <span class="o">-</span><span class="n">I</span> <span class="n">zstd</span> <span class="o">-</span><span class="n">xf</span> <span class="n">step_383500_slim</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">zstd</span>
+
+<span class="err">!</span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">kingoflolz</span><span class="o">/</span><span class="n">mesh</span><span class="o">-</span><span class="n">transformer</span><span class="o">-</span><span class="n">jax</span><span class="o">.</span><span class="n">git</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">mesh</span><span class="o">-</span><span class="n">transformer</span><span class="o">-</span><span class="n">jax</span><span class="o">/</span><span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+
+<span class="c1"># jax 0.2.12 is required due to a regression with xmap in 0.2.13</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">mesh</span><span class="o">-</span><span class="n">transformer</span><span class="o">-</span><span class="n">jax</span><span class="o">/</span> <span class="n">jax</span><span class="o">==</span><span class="mf">0.2</span><span class="o">.</span><span class="mi">12</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Output" data-close="Show Output"></summary>
+        <p>
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following NEW packages will be installed:
+  zstd
+0 upgraded, 1 newly installed, 0 to remove and 39 not upgraded.
+Need to get 278 kB of archives.
+After this operation, 1,141 kB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu bionic-updates/universe amd64 zstd amd64 1.3.3+dfsg-2ubuntu1.2 [278 kB]
+Fetched 278 kB in 1s (375 kB/s)
+Selecting previously unselected package zstd.
+(Reading database ... 160772 files and directories currently installed.)
+Preparing to unpack .../zstd_1.3.3+dfsg-2ubuntu1.2_amd64.deb ...
+Unpacking zstd (1.3.3+dfsg-2ubuntu1.2) ...
+Setting up zstd (1.3.3+dfsg-2ubuntu1.2) ...
+Processing triggers for man-db (2.8.3-2ubuntu0.1) ...
+--2021-06-25 01:33:38--  https://the-eye.eu/public/AI/GPT-J-6B/step_383500_slim.tar.zstd
+Resolving the-eye.eu (the-eye.eu)... 162.213.130.242
+Connecting to the-eye.eu (the-eye.eu)|162.213.130.242|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 9414712325 (8.8G) [application/octet-stream]
+Saving to: ‘step_383500_slim.tar.zstd’
+
+step_383500_slim.ta 100%[===================&gt;]   8.77G  34.6MB/s    in 3m 19s  
+
+2021-06-25 01:36:56 (45.2 MB/s) - ‘step_383500_slim.tar.zstd’ saved [9414712325/9414712325]
+
+
+real	3m21.064s
+user	0m5.690s
+sys	0m23.579s
+
+real	4m0.314s
+user	0m35.084s
+sys	0m40.486s
+Cloning into &#39;mesh-transformer-jax&#39;...
+remote: Enumerating objects: 531, done.
+remote: Counting objects: 100% (130/130), done.
+remote: Compressing objects: 100% (61/61), done.
+remote: Total 531 (delta 98), reused 81 (delta 69), pack-reused 401
+Receiving objects: 100% (531/531), 176.53 KiB | 3.46 MiB/s, done.
+Resolving deltas: 100% (346/346), done.
+Collecting git+https://github.com/deepmind/dm-haiku (from -r mesh-transformer-jax/requirements.txt (line 10))
+  Cloning https://github.com/deepmind/dm-haiku to /tmp/pip-req-build-1chvq9i7
+  Running command git clone -q https://github.com/deepmind/dm-haiku /tmp/pip-req-build-1chvq9i7
+Collecting git+https://github.com/EleutherAI/lm-evaluation-harness/ (from -r mesh-transformer-jax/requirements.txt (line 11))
+  Cloning https://github.com/EleutherAI/lm-evaluation-harness/ to /tmp/pip-req-build-m_53n_vt
+  Running command git clone -q https://github.com/EleutherAI/lm-evaluation-harness/ /tmp/pip-req-build-m_53n_vt
+Requirement already satisfied: numpy~=1.19.5 in /usr/local/lib/python3.7/dist-packages (from -r mesh-transformer-jax/requirements.txt (line 1)) (1.19.5)
+Collecting transformers~=4.4.2
+  Downloading https://files.pythonhosted.org/packages/ed/d5/f4157a376b8a79489a76ce6cfe147f4f3be1e029b7144fa7b8432e8acb26/transformers-4.4.2-py3-none-any.whl (2.0MB)
+     |████████████████████████████████| 2.0MB 6.8MB/s 
+Collecting tqdm~=4.45.0
+  Downloading https://files.pythonhosted.org/packages/4a/1c/6359be64e8301b84160f6f6f7936bbfaaa5e9a4eab6cbc681db07600b949/tqdm-4.45.0-py2.py3-none-any.whl (60kB)
+     |████████████████████████████████| 61kB 6.8MB/s 
+Collecting setuptools~=51.3.3
+  Downloading https://files.pythonhosted.org/packages/b2/81/509db0082c0d2ca2af307c6652ea422865de1f83c14b1e1f3549e415cfac/setuptools-51.3.3-py3-none-any.whl (786kB)
+     |████████████████████████████████| 788kB 21.8MB/s 
+Collecting wandb~=0.10.22
+  Downloading https://files.pythonhosted.org/packages/e0/b4/9d92953d8cddc8450c859be12e3dbdd4c7754fb8def94c28b3b351c6ee4e/wandb-0.10.32-py2.py3-none-any.whl (1.8MB)
+     |████████████████████████████████| 1.8MB 29.3MB/s 
+Collecting einops~=0.3.0
+  Downloading https://files.pythonhosted.org/packages/5d/a0/9935e030634bf60ecd572c775f64ace82ceddf2f504a5fd3902438f07090/einops-0.3.0-py2.py3-none-any.whl
+Collecting requests~=2.25.1
+  Downloading https://files.pythonhosted.org/packages/29/c1/24814557f1d22c56d50280771a17307e6bf87b70727d975fd6b2ce6b014a/requests-2.25.1-py2.py3-none-any.whl (61kB)
+     |████████████████████████████████| 61kB 7.6MB/s 
+Collecting fabric~=2.6.0
+  Downloading https://files.pythonhosted.org/packages/c1/9d/59df62b620985871a4ba7d8b509b84340bbd1573257e55a427ae2df2d56e/fabric-2.6.0-py2.py3-none-any.whl (53kB)
+     |████████████████████████████████| 61kB 8.0MB/s 
+Collecting optax==0.0.6
+  Downloading https://files.pythonhosted.org/packages/ec/7a/6259edd319ee7fa94dd23c54f15eff667f599d179e889af90fe0c204612c/optax-0.0.6-py3-none-any.whl (96kB)
+     |████████████████████████████████| 102kB 11.2MB/s 
+Collecting ray~=1.2.0
+  Downloading https://files.pythonhosted.org/packages/11/14/15d0f0aec20a4674a996429160565a071688f27f49f789327ebed8188ffb/ray-1.2.0-cp37-cp37m-manylinux2014_x86_64.whl (47.5MB)
+     |████████████████████████████████| 47.5MB 88kB/s 
+Requirement already satisfied: jax~=0.2.12 in /usr/local/lib/python3.7/dist-packages (from -r mesh-transformer-jax/requirements.txt (line 13)) (0.2.13)
+Requirement already satisfied: Flask~=1.1.2 in /usr/local/lib/python3.7/dist-packages (from -r mesh-transformer-jax/requirements.txt (line 14)) (1.1.4)
+Requirement already satisfied: cloudpickle~=1.3.0 in /usr/local/lib/python3.7/dist-packages (from -r mesh-transformer-jax/requirements.txt (line 15)) (1.3.0)
+Collecting tensorflow-cpu~=2.4.1
+  Downloading https://files.pythonhosted.org/packages/69/99/c4ffb7dec86049dcbe871262622caef477ff248963d0398d07c8d726a6de/tensorflow_cpu-2.4.2-cp37-cp37m-manylinux2010_x86_64.whl (144.3MB)
+     |████████████████████████████████| 144.3MB 30kB/s 
+Collecting google-cloud-storage~=1.36.2
+  Downloading https://files.pythonhosted.org/packages/f2/0e/da07ffa511daa559bcc209f9344d71a90ba4d7b391fb795e6282f86d2935/google_cloud_storage-1.36.2-py2.py3-none-any.whl (97kB)
+     |████████████████████████████████| 102kB 11.6MB/s 
+Requirement already satisfied: smart_open[gcs] in /usr/local/lib/python3.7/dist-packages (from -r mesh-transformer-jax/requirements.txt (line 18)) (5.1.0)
+Collecting func_timeout
+  Downloading https://files.pythonhosted.org/packages/b3/0d/bf0567477f7281d9a3926c582bfef21bff7498fc0ffd3e9de21811896a0b/func_timeout-4.3.5.tar.gz (44kB)
+     |████████████████████████████████| 51kB 6.8MB/s 
+Collecting ftfy
+  Downloading https://files.pythonhosted.org/packages/af/da/d215a091986e5f01b80f5145cff6f22e2dc57c6b048aab2e882a07018473/ftfy-6.0.3.tar.gz (64kB)
+     |████████████████████████████████| 71kB 8.2MB/s 
+Requirement already satisfied: absl-py&gt;=0.7.1 in /usr/local/lib/python3.7/dist-packages (from dm-haiku==0.0.5.dev0-&gt;-r mesh-transformer-jax/requirements.txt (line 10)) (0.12.0)
+Collecting jmp&gt;=0.0.2
+  Downloading https://files.pythonhosted.org/packages/ff/5c/1482f4a4a502e080af2ca54d7f80a60b5d4735f464c151666d583b78c226/jmp-0.0.2-py3-none-any.whl
+Requirement already satisfied: tabulate&gt;=0.8.9 in /usr/local/lib/python3.7/dist-packages (from dm-haiku==0.0.5.dev0-&gt;-r mesh-transformer-jax/requirements.txt (line 10)) (0.8.9)
+Requirement already satisfied: typing_extensions in /usr/local/lib/python3.7/dist-packages (from dm-haiku==0.0.5.dev0-&gt;-r mesh-transformer-jax/requirements.txt (line 10)) (3.7.4.3)
+Collecting black==20.8b1
+  Downloading https://files.pythonhosted.org/packages/dc/7b/5a6bbe89de849f28d7c109f5ea87b65afa5124ad615f3419e71beb29dc96/black-20.8b1.tar.gz (1.1MB)
+     |████████████████████████████████| 1.1MB 51.7MB/s 
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+    Preparing wheel metadata ... done
+Collecting best_download&gt;=0.0.6
+  Downloading https://files.pythonhosted.org/packages/cd/8f/d8f2145cb0fd42ca55a6c6420d512156b6ff5d9857b3dd9cd0d679377cc5/best_download-0.0.7-py3-none-any.whl
+Collecting datasets&gt;=1.2.1
+  Downloading https://files.pythonhosted.org/packages/08/a2/d4e1024c891506e1cee8f9d719d20831bac31cb5b7416983c4d2f65a6287/datasets-1.8.0-py3-none-any.whl (237kB)
+     |████████████████████████████████| 245kB 53.0MB/s 
+Requirement already satisfied: click&gt;=7.1 in /usr/local/lib/python3.7/dist-packages (from lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (7.1.2)
+Collecting scikit-learn&gt;=0.24.1
+  Downloading https://files.pythonhosted.org/packages/a8/eb/a48f25c967526b66d5f1fa7a984594f0bf0a5afafa94a8c4dbc317744620/scikit_learn-0.24.2-cp37-cp37m-manylinux2010_x86_64.whl (22.3MB)
+     |████████████████████████████████| 22.3MB 1.4MB/s 
+Requirement already satisfied: torch&gt;=1.7 in /usr/local/lib/python3.7/dist-packages (from lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (1.9.0+cu102)
+Collecting sqlitedict==1.6.0
+  Downloading https://files.pythonhosted.org/packages/0f/1c/c757b93147a219cf1e25cef7e1ad9b595b7f802159493c45ce116521caff/sqlitedict-1.6.0.tar.gz
+Collecting pytablewriter==0.58.0
+  Downloading https://files.pythonhosted.org/packages/fd/e2/62b208cdb8771dee1849bd2b4ed129284e1efff7669985697e4c124c1000/pytablewriter-0.58.0-py3-none-any.whl (96kB)
+     |████████████████████████████████| 102kB 11.6MB/s 
+Collecting sacrebleu==1.5.0
+  Downloading https://files.pythonhosted.org/packages/3b/7f/4fd83db8570288c3899d8e57666c2841403c15659f3d792a3cb8dc1c6689/sacrebleu-1.5.0-py3-none-any.whl (65kB)
+     |████████████████████████████████| 71kB 8.5MB/s 
+Collecting pycountry==20.7.3
+  Downloading https://files.pythonhosted.org/packages/76/73/6f1a412f14f68c273feea29a6ea9b9f1e268177d32e0e69ad6790d306312/pycountry-20.7.3.tar.gz (10.1MB)
+     |████████████████████████████████| 10.1MB 51.0MB/s 
+Collecting numexpr==2.7.2
+  Downloading https://files.pythonhosted.org/packages/9c/f4/fa8755c1aa44b431267aa019922f6cc9ec099cef0c6fc0ead0f9a2aa59e5/numexpr-2.7.2-cp37-cp37m-manylinux2010_x86_64.whl (471kB)
+     |████████████████████████████████| 481kB 50.5MB/s 
+Collecting lm_dataformat==0.0.19
+  Downloading https://files.pythonhosted.org/packages/83/b5/8d10bf5a8082921792bb09c9d591dfd622cf4a16fbb7e283cc921c5ffc50/lm_dataformat-0.0.19-py3-none-any.whl
+Collecting pytest==6.2.3
+  Downloading https://files.pythonhosted.org/packages/76/4d/9c00146923da9f1cabd1878209d71b1380d537ec331a1a613e8f4b9d7985/pytest-6.2.3-py3-none-any.whl (280kB)
+     |████████████████████████████████| 286kB 53.4MB/s 
+Collecting pybind11==2.6.2
+  Downloading https://files.pythonhosted.org/packages/8d/43/7339dbabbc2793718d59703aace4166f53c29ee1c202f6ff5bf8a26c4d91/pybind11-2.6.2-py2.py3-none-any.whl (191kB)
+     |████████████████████████████████| 194kB 59.3MB/s 
+Collecting tqdm-multiprocess==0.0.11
+  Downloading https://files.pythonhosted.org/packages/25/7e/0d889fc6c84e3df6b69aaafe893fc77f69b3d968ac9ce574d1c62c688050/tqdm_multiprocess-0.0.11-py3-none-any.whl
+Collecting zstandard==0.15.2
+  Downloading https://files.pythonhosted.org/packages/5b/56/dc2a85d06e973f2ad96584b0e5b876d063135d449cb040aeaadd22a910f9/zstandard-0.15.2-cp37-cp37m-manylinux2014_x86_64.whl (2.2MB)
+     |████████████████████████████████| 2.2MB 52.1MB/s 
+Collecting jsonlines==2.0.0
+  Downloading https://files.pythonhosted.org/packages/d4/58/06f430ff7607a2929f80f07bfd820acbc508a4e977542fefcc522cde9dff/jsonlines-2.0.0-py3-none-any.whl
+Collecting mock==4.0.3
+  Downloading https://files.pythonhosted.org/packages/5c/03/b7e605db4a57c0f6fba744b11ef3ddf4ddebcada35022927a2b5fc623fdf/mock-4.0.3-py3-none-any.whl
+Collecting openai==0.6.4
+  Downloading https://files.pythonhosted.org/packages/00/6b/ec780cfdd44ce0d7e56aae12477fe163ad152078cfdb744dfccab4ddae4b/openai-0.6.4.tar.gz (159kB)
+     |████████████████████████████████| 163kB 56.9MB/s 
+Requirement already satisfied: filelock in /usr/local/lib/python3.7/dist-packages (from transformers~=4.4.2-&gt;-r mesh-transformer-jax/requirements.txt (line 2)) (3.0.12)
+Requirement already satisfied: regex!=2019.12.17 in /usr/local/lib/python3.7/dist-packages (from transformers~=4.4.2-&gt;-r mesh-transformer-jax/requirements.txt (line 2)) (2019.12.20)
+Collecting tokenizers&lt;0.11,&gt;=0.10.1
+  Downloading https://files.pythonhosted.org/packages/d4/e2/df3543e8ffdab68f5acc73f613de9c2b155ac47f162e725dcac87c521c11/tokenizers-0.10.3-cp37-cp37m-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl (3.3MB)
+     |████████████████████████████████| 3.3MB 50.9MB/s 
+Requirement already satisfied: packaging in /usr/local/lib/python3.7/dist-packages (from transformers~=4.4.2-&gt;-r mesh-transformer-jax/requirements.txt (line 2)) (20.9)
+Requirement already satisfied: importlib-metadata; python_version &lt; &#34;3.8&#34; in /usr/local/lib/python3.7/dist-packages (from transformers~=4.4.2-&gt;-r mesh-transformer-jax/requirements.txt (line 2)) (4.5.0)
+Collecting sacremoses
+  Downloading https://files.pythonhosted.org/packages/75/ee/67241dc87f266093c533a2d4d3d69438e57d7a90abb216fa076e7d475d4a/sacremoses-0.0.45-py3-none-any.whl (895kB)
+     |████████████████████████████████| 901kB 48.1MB/s 
+Collecting pathtools
+  Downloading https://files.pythonhosted.org/packages/e7/7f/470d6fcdf23f9f3518f6b0b76be9df16dcc8630ad409947f8be2eb0ed13a/pathtools-0.1.2.tar.gz
+Requirement already satisfied: python-dateutil&gt;=2.6.1 in /usr/local/lib/python3.7/dist-packages (from wandb~=0.10.22-&gt;-r mesh-transformer-jax/requirements.txt (line 5)) (2.8.1)
+Requirement already satisfied: promise&lt;3,&gt;=2.0 in /usr/local/lib/python3.7/dist-packages (from wandb~=0.10.22-&gt;-r mesh-transformer-jax/requirements.txt (line 5)) (2.3)
+Collecting shortuuid&gt;=0.5.0
+  Downloading https://files.pythonhosted.org/packages/25/a6/2ecc1daa6a304e7f1b216f0896b26156b78e7c38e1211e9b798b4716c53d/shortuuid-1.0.1-py3-none-any.whl
+Requirement already satisfied: psutil&gt;=5.0.0 in /usr/local/lib/python3.7/dist-packages (from wandb~=0.10.22-&gt;-r mesh-transformer-jax/requirements.txt (line 5)) (5.4.8)
+Collecting sentry-sdk&gt;=0.4.0
+  Downloading https://files.pythonhosted.org/packages/1c/4a/a54b254f67d8f4052338d54ebe90126f200693440a93ef76d254d581e3ec/sentry_sdk-1.1.0-py2.py3-none-any.whl (131kB)
+     |████████████████████████████████| 133kB 52.4MB/s 
+Requirement already satisfied: PyYAML in /usr/local/lib/python3.7/dist-packages (from wandb~=0.10.22-&gt;-r mesh-transformer-jax/requirements.txt (line 5)) (3.13)
+Requirement already satisfied: protobuf&gt;=3.12.0 in /usr/local/lib/python3.7/dist-packages (from wandb~=0.10.22-&gt;-r mesh-transformer-jax/requirements.txt (line 5)) (3.12.4)
+Requirement already satisfied: six&gt;=1.13.0 in /usr/local/lib/python3.7/dist-packages (from wandb~=0.10.22-&gt;-r mesh-transformer-jax/requirements.txt (line 5)) (1.15.0)
+Collecting docker-pycreds&gt;=0.4.0
+  Downloading https://files.pythonhosted.org/packages/f5/e8/f6bd1eee09314e7e6dee49cbe2c5e22314ccdb38db16c9fc72d2fa80d054/docker_pycreds-0.4.0-py2.py3-none-any.whl
+Collecting configparser&gt;=3.8.1
+  Downloading https://files.pythonhosted.org/packages/fd/01/ff260a18caaf4457eb028c96eeb405c4a230ca06c8ec9c1379f813caa52e/configparser-5.0.2-py3-none-any.whl
+Collecting GitPython&gt;=1.0.0
+  Downloading https://files.pythonhosted.org/packages/bc/91/b38c4fabb6e5092ab23492ded4f318ab7299b19263272b703478038c0fbc/GitPython-3.1.18-py3-none-any.whl (170kB)
+     |████████████████████████████████| 174kB 52.2MB/s 
+Collecting subprocess32&gt;=3.5.3
+  Downloading https://files.pythonhosted.org/packages/32/c8/564be4d12629b912ea431f1a50eb8b3b9d00f1a0b1ceff17f266be190007/subprocess32-3.5.4.tar.gz (97kB)
+     |████████████████████████████████| 102kB 11.6MB/s 
+Requirement already satisfied: urllib3&lt;1.27,&gt;=1.21.1 in /usr/local/lib/python3.7/dist-packages (from requests~=2.25.1-&gt;-r mesh-transformer-jax/requirements.txt (line 7)) (1.24.3)
+Requirement already satisfied: chardet&lt;5,&gt;=3.0.2 in /usr/local/lib/python3.7/dist-packages (from requests~=2.25.1-&gt;-r mesh-transformer-jax/requirements.txt (line 7)) (3.0.4)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.7/dist-packages (from requests~=2.25.1-&gt;-r mesh-transformer-jax/requirements.txt (line 7)) (2021.5.30)
+Requirement already satisfied: idna&lt;3,&gt;=2.5 in /usr/local/lib/python3.7/dist-packages (from requests~=2.25.1-&gt;-r mesh-transformer-jax/requirements.txt (line 7)) (2.10)
+Collecting paramiko&gt;=2.4
+  Downloading https://files.pythonhosted.org/packages/95/19/124e9287b43e6ff3ebb9cdea3e5e8e88475a873c05ccdf8b7e20d2c4201e/paramiko-2.7.2-py2.py3-none-any.whl (206kB)
+     |████████████████████████████████| 215kB 51.2MB/s 
+Collecting pathlib2
+  Downloading https://files.pythonhosted.org/packages/e9/45/9c82d3666af4ef9f221cbb954e1d77ddbb513faf552aea6df5f37f1a4859/pathlib2-2.3.5-py2.py3-none-any.whl
+Collecting invoke&lt;2.0,&gt;=1.3
+  Downloading https://files.pythonhosted.org/packages/87/8f/c153d7db091f342da6bc97f7bedd1b2ce2867c4a8b0aab40fbba85a05e33/invoke-1.5.0-py3-none-any.whl (211kB)
+     |████████████████████████████████| 215kB 55.6MB/s 
+Collecting chex&gt;=0.0.4
+  Downloading https://files.pythonhosted.org/packages/f5/b9/445eb59ec23249acffc5322c79b07e20b12dbff45b9c1da6cdae9e947685/chex-0.0.7-py3-none-any.whl (52kB)
+     |████████████████████████████████| 61kB 8.1MB/s 
+Requirement already satisfied: jaxlib&gt;=0.1.37 in /usr/local/lib/python3.7/dist-packages (from optax==0.0.6-&gt;-r mesh-transformer-jax/requirements.txt (line 9)) (0.1.66+cuda110)
+Collecting redis&gt;=3.5.0
+  Downloading https://files.pythonhosted.org/packages/a7/7c/24fb0511df653cf1a5d938d8f5d19802a88cef255706fdda242ff97e91b7/redis-3.5.3-py2.py3-none-any.whl (72kB)
+     |████████████████████████████████| 81kB 9.3MB/s 
+Collecting opencensus
+  Downloading https://files.pythonhosted.org/packages/18/59/12044123133d000f705383ad98579aeb0dd82d66b33a254a21b54bf0d6bb/opencensus-0.7.13-py2.py3-none-any.whl (127kB)
+     |████████████████████████████████| 133kB 56.9MB/s 
+Requirement already satisfied: grpcio&gt;=1.28.1 in /usr/local/lib/python3.7/dist-packages (from ray~=1.2.0-&gt;-r mesh-transformer-jax/requirements.txt (line 12)) (1.34.1)
+Requirement already satisfied: jsonschema in /usr/local/lib/python3.7/dist-packages (from ray~=1.2.0-&gt;-r mesh-transformer-jax/requirements.txt (line 12)) (2.6.0)
+Collecting colorama
+  Downloading https://files.pythonhosted.org/packages/44/98/5b86278fbbf250d239ae0ecb724f8572af1c91f4a11edf4d36a206189440/colorama-0.4.4-py2.py3-none-any.whl
+Collecting gpustat
+  Downloading https://files.pythonhosted.org/packages/b4/69/d8c849715171aeabd61af7da080fdc60948b5a396d2422f1f4672e43d008/gpustat-0.6.0.tar.gz (78kB)
+     |████████████████████████████████| 81kB 9.0MB/s 
+Collecting py-spy&gt;=0.2.0
+  Downloading https://files.pythonhosted.org/packages/9d/4d/1a9cbe9a0b543e6733cb38afe26451522a9ef8e4897b59e74cc76838f245/py_spy-0.3.7-py2.py3-none-manylinux1_x86_64.whl (3.1MB)
+     |████████████████████████████████| 3.1MB 46.7MB/s 
+Collecting aioredis
+  Downloading https://files.pythonhosted.org/packages/b0/64/1b1612d0a104f21f80eb4c6e1b6075f2e6aba8e228f46f229cfd3fdac859/aioredis-1.3.1-py3-none-any.whl (65kB)
+     |████████████████████████████████| 71kB 9.1MB/s 
+Requirement already satisfied: msgpack&lt;2.0.0,&gt;=1.0.0 in /usr/local/lib/python3.7/dist-packages (from ray~=1.2.0-&gt;-r mesh-transformer-jax/requirements.txt (line 12)) (1.0.2)
+Collecting aiohttp
+  Downloading https://files.pythonhosted.org/packages/88/c0/5890b4c8b04a79b7360e8fe4490feb0bb3ab179743f199f0e6220cebd568/aiohttp-3.7.4.post0-cp37-cp37m-manylinux2014_x86_64.whl (1.3MB)
+     |████████████████████████████████| 1.3MB 47.5MB/s 
+Collecting aiohttp-cors
+  Downloading https://files.pythonhosted.org/packages/13/e7/e436a0c0eb5127d8b491a9b83ecd2391c6ff7dcd5548dfaec2080a2340fd/aiohttp_cors-0.7.0-py3-none-any.whl
+Collecting colorful
+  Downloading https://files.pythonhosted.org/packages/b0/8e/e386e248266952d24d73ed734c2f5513f34d9557032618c8910e605dfaf6/colorful-0.5.4-py2.py3-none-any.whl (201kB)
+     |████████████████████████████████| 204kB 55.3MB/s 
+Requirement already satisfied: prometheus-client&gt;=0.7.1 in /usr/local/lib/python3.7/dist-packages (from ray~=1.2.0-&gt;-r mesh-transformer-jax/requirements.txt (line 12)) (0.11.0)
+Requirement already satisfied: opt-einsum in /usr/local/lib/python3.7/dist-packages (from jax~=0.2.12-&gt;-r mesh-transformer-jax/requirements.txt (line 13)) (3.3.0)
+Requirement already satisfied: Jinja2&lt;3.0,&gt;=2.10.1 in /usr/local/lib/python3.7/dist-packages (from Flask~=1.1.2-&gt;-r mesh-transformer-jax/requirements.txt (line 14)) (2.11.3)
+Requirement already satisfied: Werkzeug&lt;2.0,&gt;=0.15 in /usr/local/lib/python3.7/dist-packages (from Flask~=1.1.2-&gt;-r mesh-transformer-jax/requirements.txt (line 14)) (1.0.1)
+Requirement already satisfied: itsdangerous&lt;2.0,&gt;=0.24 in /usr/local/lib/python3.7/dist-packages (from Flask~=1.1.2-&gt;-r mesh-transformer-jax/requirements.txt (line 14)) (1.1.0)
+Collecting tensorflow-estimator&lt;2.5.0,&gt;=2.4.0
+  Downloading https://files.pythonhosted.org/packages/74/7e/622d9849abf3afb81e482ffc170758742e392ee129ce1540611199a59237/tensorflow_estimator-2.4.0-py2.py3-none-any.whl (462kB)
+     |████████████████████████████████| 471kB 51.2MB/s 
+Requirement already satisfied: termcolor~=1.1.0 in /usr/local/lib/python3.7/dist-packages (from tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (1.1.0)
+Requirement already satisfied: keras-preprocessing~=1.1.2 in /usr/local/lib/python3.7/dist-packages (from tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (1.1.2)
+Requirement already satisfied: flatbuffers~=1.12.0 in /usr/local/lib/python3.7/dist-packages (from tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (1.12)
+Requirement already satisfied: wheel~=0.35 in /usr/local/lib/python3.7/dist-packages (from tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (0.36.2)
+Collecting h5py~=2.10.0
+  Downloading https://files.pythonhosted.org/packages/3f/c0/abde58b837e066bca19a3f7332d9d0493521d7dd6b48248451a9e3fe2214/h5py-2.10.0-cp37-cp37m-manylinux1_x86_64.whl (2.9MB)
+     |████████████████████████████████| 2.9MB 51.7MB/s 
+Requirement already satisfied: google-pasta~=0.2 in /usr/local/lib/python3.7/dist-packages (from tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (0.2.0)
+Requirement already satisfied: wrapt~=1.12.1 in /usr/local/lib/python3.7/dist-packages (from tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (1.12.1)
+Requirement already satisfied: tensorboard~=2.4 in /usr/local/lib/python3.7/dist-packages (from tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (2.5.0)
+Requirement already satisfied: astunparse~=1.6.3 in /usr/local/lib/python3.7/dist-packages (from tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (1.6.3)
+Collecting gast==0.3.3
+  Downloading https://files.pythonhosted.org/packages/d6/84/759f5dd23fec8ba71952d97bcc7e2c9d7d63bdc582421f3cd4be845f0c98/gast-0.3.3-py2.py3-none-any.whl
+Collecting google-resumable-media&lt;2.0dev,&gt;=1.2.0
+  Downloading https://files.pythonhosted.org/packages/11/96/4360dc70bef5559b3faf3deeda97aae7d10ff7660d41fd233eb792e7d09f/google_resumable_media-1.3.1-py2.py3-none-any.whl (75kB)
+     |████████████████████████████████| 81kB 9.5MB/s 
+Collecting google-cloud-core&lt;2.0dev,&gt;=1.4.1
+  Downloading https://files.pythonhosted.org/packages/f7/10/e1afff08fc67491717d430aeca479ef4f0255843c9c8b472e5efd62782dc/google_cloud_core-1.7.0-py2.py3-none-any.whl
+Requirement already satisfied: google-auth&lt;2.0dev,&gt;=1.11.0 in /usr/local/lib/python3.7/dist-packages (from google-cloud-storage~=1.36.2-&gt;-r mesh-transformer-jax/requirements.txt (line 17)) (1.31.0)
+Requirement already satisfied: wcwidth in /usr/local/lib/python3.7/dist-packages (from ftfy-&gt;-r mesh-transformer-jax/requirements.txt (line 20)) (0.2.5)
+Requirement already satisfied: appdirs in /usr/local/lib/python3.7/dist-packages (from black==20.8b1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (1.4.4)
+Requirement already satisfied: toml&gt;=0.10.1 in /usr/local/lib/python3.7/dist-packages (from black==20.8b1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (0.10.2)
+Collecting typed-ast&gt;=1.4.0
+  Downloading https://files.pythonhosted.org/packages/65/b3/573d2f1fecbbe8f82a8d08172e938c247f99abe1be3bef3da2efaa3810bf/typed_ast-1.4.3-cp37-cp37m-manylinux1_x86_64.whl (743kB)
+     |████████████████████████████████| 747kB 52.0MB/s 
+Collecting pathspec&lt;1,&gt;=0.6
+  Downloading https://files.pythonhosted.org/packages/29/29/a465741a3d97ea3c17d21eaad4c64205428bde56742360876c4391f930d4/pathspec-0.8.1-py2.py3-none-any.whl
+Collecting mypy-extensions&gt;=0.4.3
+  Downloading https://files.pythonhosted.org/packages/5c/eb/975c7c080f3223a5cdaff09612f3a5221e4ba534f7039db34c35d95fa6a5/mypy_extensions-0.4.3-py2.py3-none-any.whl
+Collecting rehash
+  Downloading https://files.pythonhosted.org/packages/c9/e4/30db193232d9e9c8e123764d84f0807535677548833ca251556ad6134c24/rehash-1.0.0-py2.py3-none-any.whl
+Collecting huggingface-hub&lt;0.1.0
+  Downloading https://files.pythonhosted.org/packages/2f/ee/97e253668fda9b17e968b3f97b2f8e53aa0127e8807d24a547687423fe0b/huggingface_hub-0.0.12-py3-none-any.whl
+Collecting xxhash
+  Downloading https://files.pythonhosted.org/packages/7d/4f/0a862cad26aa2ed7a7cd87178cbbfa824fc1383e472d63596a0d018374e7/xxhash-2.0.2-cp37-cp37m-manylinux2010_x86_64.whl (243kB)
+     |████████████████████████████████| 245kB 49.6MB/s 
+Requirement already satisfied: pyarrow&lt;4.0.0,&gt;=1.0.0 in /usr/local/lib/python3.7/dist-packages (from datasets&gt;=1.2.1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (3.0.0)
+Requirement already satisfied: dill in /usr/local/lib/python3.7/dist-packages (from datasets&gt;=1.2.1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (0.3.4)
+Requirement already satisfied: pandas in /usr/local/lib/python3.7/dist-packages (from datasets&gt;=1.2.1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (1.1.5)
+Collecting fsspec
+  Downloading https://files.pythonhosted.org/packages/0e/3a/666e63625a19883ae8e1674099e631f9737bd5478c4790e5ad49c5ac5261/fsspec-2021.6.1-py3-none-any.whl (115kB)
+     |████████████████████████████████| 122kB 57.3MB/s 
+Requirement already satisfied: multiprocess in /usr/local/lib/python3.7/dist-packages (from datasets&gt;=1.2.1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (0.70.12.2)
+Collecting threadpoolctl&gt;=2.0.0
+  Downloading https://files.pythonhosted.org/packages/f7/12/ec3f2e203afa394a149911729357aa48affc59c20e2c1c8297a60f33f133/threadpoolctl-2.1.0-py3-none-any.whl
+Requirement already satisfied: joblib&gt;=0.11 in /usr/local/lib/python3.7/dist-packages (from scikit-learn&gt;=0.24.1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (1.0.1)
+Requirement already satisfied: scipy&gt;=0.19.1 in /usr/local/lib/python3.7/dist-packages (from scikit-learn&gt;=0.24.1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (1.4.1)
+Collecting tabledata&lt;2,&gt;=1.1.3
+  Downloading https://files.pythonhosted.org/packages/85/93/4c695da7e6589e1e4b513c02d5b562dcc5afacb8a2f6cac8eb2ac2e88833/tabledata-1.1.4-py3-none-any.whl
+Collecting mbstrdecoder&lt;2,&gt;=1.0.0
+  Downloading https://files.pythonhosted.org/packages/e8/f6/0e6bb50c3c6380a4982c87d80e70b2f6e366523a57a0c58594aea472206d/mbstrdecoder-1.0.1-py3-none-any.whl
+Collecting tcolorpy&lt;1,&gt;=0.0.5
+  Downloading https://files.pythonhosted.org/packages/96/73/2a73a7d53df3708636dae4e817814d07e455efd53897476f3863925cf0af/tcolorpy-0.1.1-py3-none-any.whl
+Collecting msgfy&lt;1,&gt;=0.1.0
+  Downloading https://files.pythonhosted.org/packages/48/52/c4441871514276e7c4cb51c122e663b5ef19dc20030f6ab7723071118464/msgfy-0.1.0-py3-none-any.whl
+Collecting DataProperty&lt;2,&gt;=0.50.0
+  Downloading https://files.pythonhosted.org/packages/b9/5f/c773c362fcba227d6a4021225cb0213b51849c7dc9c93004d34d9004078b/DataProperty-0.50.1-py3-none-any.whl
+Collecting pathvalidate&lt;3,&gt;=2.3.0
+  Downloading https://files.pythonhosted.org/packages/87/55/7d63b78986f1f8764180b84ee3e8a47c583ec059d32c98d8fba7fc0dc1ae/pathvalidate-2.4.1-py3-none-any.whl
+Collecting typepy[datetime]&lt;2,&gt;=1.1.1
+  Downloading https://files.pythonhosted.org/packages/60/3a/1239e59924250d9c2dd1d5b84748da82d15aaa241b3ceeffa08aa5eba589/typepy-1.1.5-py3-none-any.whl
+Collecting portalocker
+  Downloading https://files.pythonhosted.org/packages/68/33/cb524f4de298509927b90aa5ee34767b9a2b93e663cf354b2a3efa2b4acd/portalocker-2.3.0-py2.py3-none-any.whl
+Collecting ujson
+  Downloading https://files.pythonhosted.org/packages/17/4e/50e8e4cf5f00b537095711c2c86ac4d7191aed2b4fffd5a19f06898f6929/ujson-4.0.2-cp37-cp37m-manylinux1_x86_64.whl (179kB)
+     |████████████████████████████████| 184kB 56.6MB/s 
+Requirement already satisfied: py&gt;=1.8.2 in /usr/local/lib/python3.7/dist-packages (from pytest==6.2.3-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (1.10.0)
+Requirement already satisfied: iniconfig in /usr/local/lib/python3.7/dist-packages (from pytest==6.2.3-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (1.1.1)
+Requirement already satisfied: attrs&gt;=19.2.0 in /usr/local/lib/python3.7/dist-packages (from pytest==6.2.3-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (21.2.0)
+Collecting pluggy&lt;1.0.0a1,&gt;=0.12
+  Downloading https://files.pythonhosted.org/packages/a0/28/85c7aa31b80d150b772fbe4a229487bc6644da9ccb7e427dd8cc60cb8a62/pluggy-0.13.1-py2.py3-none-any.whl
+Requirement already satisfied: pyparsing&gt;=2.0.2 in /usr/local/lib/python3.7/dist-packages (from packaging-&gt;transformers~=4.4.2-&gt;-r mesh-transformer-jax/requirements.txt (line 2)) (2.4.7)
+Requirement already satisfied: zipp&gt;=0.5 in /usr/local/lib/python3.7/dist-packages (from importlib-metadata; python_version &lt; &#34;3.8&#34;-&gt;transformers~=4.4.2-&gt;-r mesh-transformer-jax/requirements.txt (line 2)) (3.4.1)
+Collecting gitdb&lt;5,&gt;=4.0.1
+  Downloading https://files.pythonhosted.org/packages/ea/e8/f414d1a4f0bbc668ed441f74f44c116d9816833a48bf81d22b697090dba8/gitdb-4.0.7-py3-none-any.whl (63kB)
+     |████████████████████████████████| 71kB 8.4MB/s 
+Collecting cryptography&gt;=2.5
+  Downloading https://files.pythonhosted.org/packages/b2/26/7af637e6a7e87258b963f1731c5982fb31cd507f0d90d91836e446955d02/cryptography-3.4.7-cp36-abi3-manylinux2014_x86_64.whl (3.2MB)
+     |████████████████████████████████| 3.2MB 52.1MB/s 
+Collecting pynacl&gt;=1.0.1
+  Downloading https://files.pythonhosted.org/packages/9d/57/2f5e6226a674b2bcb6db531e8b383079b678df5b10cdaa610d6cf20d77ba/PyNaCl-1.4.0-cp35-abi3-manylinux1_x86_64.whl (961kB)
+     |████████████████████████████████| 962kB 56.5MB/s 
+Collecting bcrypt&gt;=3.1.3
+  Downloading https://files.pythonhosted.org/packages/26/70/6d218afbe4c73538053c1016dd631e8f25fffc10cd01f5c272d7acf3c03d/bcrypt-3.2.0-cp36-abi3-manylinux2010_x86_64.whl (63kB)
+     |████████████████████████████████| 71kB 8.4MB/s 
+Requirement already satisfied: toolz&gt;=0.9.0 in /usr/local/lib/python3.7/dist-packages (from chex&gt;=0.0.4-&gt;optax==0.0.6-&gt;-r mesh-transformer-jax/requirements.txt (line 9)) (0.11.1)
+Requirement already satisfied: dm-tree&gt;=0.1.5 in /usr/local/lib/python3.7/dist-packages (from chex&gt;=0.0.4-&gt;optax==0.0.6-&gt;-r mesh-transformer-jax/requirements.txt (line 9)) (0.1.6)
+Collecting opencensus-context==0.1.2
+  Downloading https://files.pythonhosted.org/packages/f1/33/990f1bd9e7ee770fc8d3c154fc24743a96f16a0e49e14e1b7540cc2fdd93/opencensus_context-0.1.2-py2.py3-none-any.whl
+Requirement already satisfied: google-api-core&lt;2.0.0,&gt;=1.0.0 in /usr/local/lib/python3.7/dist-packages (from opencensus-&gt;ray~=1.2.0-&gt;-r mesh-transformer-jax/requirements.txt (line 12)) (1.26.3)
+Requirement already satisfied: nvidia-ml-py3&gt;=7.352.0 in /usr/local/lib/python3.7/dist-packages (from gpustat-&gt;ray~=1.2.0-&gt;-r mesh-transformer-jax/requirements.txt (line 12)) (7.352.0)
+Collecting blessings&gt;=1.6
+  Downloading https://files.pythonhosted.org/packages/03/74/489f85a78247609c6b4f13733cbf3ba0d864b11aa565617b645d6fdf2a4a/blessings-1.7-py3-none-any.whl
+Collecting async-timeout
+  Downloading https://files.pythonhosted.org/packages/e1/1e/5a4441be21b0726c4464f3f23c8b19628372f606755a9d2e46c187e65ec4/async_timeout-3.0.1-py3-none-any.whl
+Collecting hiredis
+  Downloading https://files.pythonhosted.org/packages/ed/33/290cea35b09c80b4634773ad5572a8030a87b5d39736719f698f521d2a13/hiredis-2.0.0-cp37-cp37m-manylinux2010_x86_64.whl (85kB)
+     |████████████████████████████████| 92kB 7.7MB/s 
+Collecting yarl&lt;2.0,&gt;=1.0
+  Downloading https://files.pythonhosted.org/packages/f1/62/046834c5fc998c88ab2ef722f5d42122230a632212c8afa76418324f53ff/yarl-1.6.3-cp37-cp37m-manylinux2014_x86_64.whl (294kB)
+     |████████████████████████████████| 296kB 54.3MB/s 
+Collecting multidict&lt;7.0,&gt;=4.5
+  Downloading https://files.pythonhosted.org/packages/7c/a6/4123b8165acbe773d1a8dc8e3f0d1edea16d29f7de018eda769abb56bd30/multidict-5.1.0-cp37-cp37m-manylinux2014_x86_64.whl (142kB)
+     |████████████████████████████████| 143kB 50.1MB/s 
+Requirement already satisfied: MarkupSafe&gt;=0.23 in /usr/local/lib/python3.7/dist-packages (from Jinja2&lt;3.0,&gt;=2.10.1-&gt;Flask~=1.1.2-&gt;-r mesh-transformer-jax/requirements.txt (line 14)) (2.0.1)
+Requirement already satisfied: tensorboard-data-server&lt;0.7.0,&gt;=0.6.0 in /usr/local/lib/python3.7/dist-packages (from tensorboard~=2.4-&gt;tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (0.6.1)
+Requirement already satisfied: google-auth-oauthlib&lt;0.5,&gt;=0.4.1 in /usr/local/lib/python3.7/dist-packages (from tensorboard~=2.4-&gt;tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (0.4.4)
+Requirement already satisfied: tensorboard-plugin-wit&gt;=1.6.0 in /usr/local/lib/python3.7/dist-packages (from tensorboard~=2.4-&gt;tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (1.8.0)
+Requirement already satisfied: markdown&gt;=2.6.8 in /usr/local/lib/python3.7/dist-packages (from tensorboard~=2.4-&gt;tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (3.3.4)
+Collecting google-crc32c&lt;2.0dev,&gt;=1.0; python_version &gt;= &#34;3.5&#34;
+  Downloading https://files.pythonhosted.org/packages/fc/ae/b6efa1019e18c6c791f0f5cd93b2ff40f8f06696dbf04db39ec0f5591b1e/google_crc32c-1.1.2-cp37-cp37m-manylinux2014_x86_64.whl
+Requirement already satisfied: pyasn1-modules&gt;=0.2.1 in /usr/local/lib/python3.7/dist-packages (from google-auth&lt;2.0dev,&gt;=1.11.0-&gt;google-cloud-storage~=1.36.2-&gt;-r mesh-transformer-jax/requirements.txt (line 17)) (0.2.8)
+Requirement already satisfied: cachetools&lt;5.0,&gt;=2.0.0 in /usr/local/lib/python3.7/dist-packages (from google-auth&lt;2.0dev,&gt;=1.11.0-&gt;google-cloud-storage~=1.36.2-&gt;-r mesh-transformer-jax/requirements.txt (line 17)) (4.2.2)
+Requirement already satisfied: rsa&lt;5,&gt;=3.1.4; python_version &gt;= &#34;3.6&#34; in /usr/local/lib/python3.7/dist-packages (from google-auth&lt;2.0dev,&gt;=1.11.0-&gt;google-cloud-storage~=1.36.2-&gt;-r mesh-transformer-jax/requirements.txt (line 17)) (4.7.2)
+Requirement already satisfied: pytz&gt;=2017.2 in /usr/local/lib/python3.7/dist-packages (from pandas-&gt;datasets&gt;=1.2.1-&gt;lm-eval-harness==0.0.1-&gt;-r mesh-transformer-jax/requirements.txt (line 11)) (2018.9)
+Collecting smmap&lt;5,&gt;=3.0.1
+  Downloading https://files.pythonhosted.org/packages/68/ee/d540eb5e5996eb81c26ceffac6ee49041d473bc5125f2aa995cf51ec1cf1/smmap-4.0.0-py2.py3-none-any.whl
+Requirement already satisfied: cffi&gt;=1.12 in /usr/local/lib/python3.7/dist-packages (from cryptography&gt;=2.5-&gt;paramiko&gt;=2.4-&gt;fabric~=2.6.0-&gt;-r mesh-transformer-jax/requirements.txt (line 8)) (1.14.5)
+Requirement already satisfied: googleapis-common-protos&lt;2.0dev,&gt;=1.6.0 in /usr/local/lib/python3.7/dist-packages (from google-api-core&lt;2.0.0,&gt;=1.0.0-&gt;opencensus-&gt;ray~=1.2.0-&gt;-r mesh-transformer-jax/requirements.txt (line 12)) (1.53.0)
+Requirement already satisfied: requests-oauthlib&gt;=0.7.0 in /usr/local/lib/python3.7/dist-packages (from google-auth-oauthlib&lt;0.5,&gt;=0.4.1-&gt;tensorboard~=2.4-&gt;tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (1.3.0)
+Requirement already satisfied: pyasn1&lt;0.5.0,&gt;=0.4.6 in /usr/local/lib/python3.7/dist-packages (from pyasn1-modules&gt;=0.2.1-&gt;google-auth&lt;2.0dev,&gt;=1.11.0-&gt;google-cloud-storage~=1.36.2-&gt;-r mesh-transformer-jax/requirements.txt (line 17)) (0.4.8)
+Requirement already satisfied: pycparser in /usr/local/lib/python3.7/dist-packages (from cffi&gt;=1.12-&gt;cryptography&gt;=2.5-&gt;paramiko&gt;=2.4-&gt;fabric~=2.6.0-&gt;-r mesh-transformer-jax/requirements.txt (line 8)) (2.20)
+Requirement already satisfied: oauthlib&gt;=3.0.0 in /usr/local/lib/python3.7/dist-packages (from requests-oauthlib&gt;=0.7.0-&gt;google-auth-oauthlib&lt;0.5,&gt;=0.4.1-&gt;tensorboard~=2.4-&gt;tensorflow-cpu~=2.4.1-&gt;-r mesh-transformer-jax/requirements.txt (line 16)) (3.1.1)
+Building wheels for collected packages: black
+  Building wheel for black (PEP 517) ... done
+  Created wheel for black: filename=black-20.8b1-cp37-none-any.whl size=124195 sha256=548f7bbfec5453ed3275ab2b4c2b1f9d9b58b73fdd408ec1d2ee68528f5153a7
+  Stored in directory: /root/.cache/pip/wheels/6e/10/b5/edf7359c2edd0305cce7e3f96e07daf7ce55dceac9d3ce3373
+Successfully built black
+Building wheels for collected packages: func-timeout, ftfy, dm-haiku, lm-eval-harness, sqlitedict, pycountry, openai, pathtools, subprocess32, gpustat
+  Building wheel for func-timeout (setup.py) ... done
+  Created wheel for func-timeout: filename=func_timeout-4.3.5-cp37-none-any.whl size=15097 sha256=26ecefae47302aa1ebe38931a0dba88ab996cdb1924c01f5c98a3c2071e8b079
+  Stored in directory: /root/.cache/pip/wheels/46/7c/4f/24f1d2d5bbff92219debe7ea19af84f76ddeb90dd4ec544f26
+  Building wheel for ftfy (setup.py) ... done
+  Created wheel for ftfy: filename=ftfy-6.0.3-cp37-none-any.whl size=41935 sha256=e5a2f13a5634567fbe9a46589ac35e0316115c3f88bea8e064e257385d9c60b0
+  Stored in directory: /root/.cache/pip/wheels/99/2c/e6/109c8a28fef7a443f67ba58df21fe1d0067ac3322e75e6b0b7
+  Building wheel for dm-haiku (setup.py) ... done
+  Created wheel for dm-haiku: filename=dm_haiku-0.0.5.dev0-cp37-none-any.whl size=530361 sha256=f7e8df87719923a67f2e8579e1b339a6b7a07fefa34dfee59f98839bf1b8191b
+  Stored in directory: /tmp/pip-ephem-wheel-cache-8jhdr5kg/wheels/97/0f/e9/17f34e377f8d4060fa88a7e82bee5d8afbf7972384768a5499
+  Building wheel for lm-eval-harness (setup.py) ... done
+  Created wheel for lm-eval-harness: filename=lm_eval_harness-0.0.1-cp37-none-any.whl size=100737 sha256=8fbe61c581ddeb48c3aa087608210f87a7cb205952e33a55b1831191347c978d
+  Stored in directory: /tmp/pip-ephem-wheel-cache-8jhdr5kg/wheels/a8/db/b4/32ca8efd6b64f9187fefbabd636d7c94cd2150a657262ee22a
+  Building wheel for sqlitedict (setup.py) ... done
+  Created wheel for sqlitedict: filename=sqlitedict-1.6.0-cp37-none-any.whl size=14714 sha256=23f2423803842bba4a4855e4b2d4052a9290b4d08e6281f45d7ed697b1220f38
+  Stored in directory: /root/.cache/pip/wheels/bd/57/d3/907c3ee02d35e66f674ad0106e61f06eeeb98f6ee66a6cc3fe
+  Building wheel for pycountry (setup.py) ... done
+  Created wheel for pycountry: filename=pycountry-20.7.3-py2.py3-none-any.whl size=10746883 sha256=a9e9facb866b8a1ae6edd9421b350ca2aef0cbbf80ce556814846b3e9ae7a698
+  Stored in directory: /root/.cache/pip/wheels/33/4e/a6/be297e6b83567e537bed9df4a93f8590ec01c1acfbcd405348
+  Building wheel for openai (setup.py) ... done
+  Created wheel for openai: filename=openai-0.6.4-cp37-none-any.whl size=172215 sha256=a555408573f881c3898fa2d8b20c41373b4277ce7c1edddac9b8f49d9b39a096
+  Stored in directory: /root/.cache/pip/wheels/f9/a3/f5/00a714fabfbe3389a25242c2f91b626dd1d8fbd63b35a96730
+  Building wheel for pathtools (setup.py) ... done
+  Created wheel for pathtools: filename=pathtools-0.1.2-cp37-none-any.whl size=8807 sha256=8370bd5a43f6d89f2ea793d078e2b139034b19553ce6f24eafe8aea63dd69d3e
+  Stored in directory: /root/.cache/pip/wheels/0b/04/79/c3b0c3a0266a3cb4376da31e5bfe8bba0c489246968a68e843
+  Building wheel for subprocess32 (setup.py) ... done
+  Created wheel for subprocess32: filename=subprocess32-3.5.4-cp37-none-any.whl size=6502 sha256=c36cb4b0a1a6a692b3df53e9aefe88da1c7c72901c4dc1ad520636d40e0f6c39
+  Stored in directory: /root/.cache/pip/wheels/68/39/1a/5e402bdfdf004af1786c8b853fd92f8c4a04f22aad179654d1
+  Building wheel for gpustat (setup.py) ... done
+  Created wheel for gpustat: filename=gpustat-0.6.0-cp37-none-any.whl size=12621 sha256=6a87d12412d0b76463a6098f4ed41a859152c3e9ed7623626dcf744d13e2adbf
+  Stored in directory: /root/.cache/pip/wheels/48/b4/d5/fb5b7f1d040f2ff20687e3bad6867d63155dbde5a7c10f4293
+Successfully built func-timeout ftfy dm-haiku lm-eval-harness sqlitedict pycountry openai pathtools subprocess32 gpustat
+<span class="ansi-red-fg">ERROR: tensorflow 2.5.0 has requirement gast==0.4.0, but you&#39;ll have gast 0.3.3 which is incompatible.</span>
+<span class="ansi-red-fg">ERROR: tensorflow 2.5.0 has requirement h5py~=3.1.0, but you&#39;ll have h5py 2.10.0 which is incompatible.</span>
+<span class="ansi-red-fg">ERROR: tensorflow 2.5.0 has requirement tensorflow-estimator&lt;2.6.0,&gt;=2.5.0rc0, but you&#39;ll have tensorflow-estimator 2.4.0 which is incompatible.</span>
+<span class="ansi-red-fg">ERROR: google-colab 1.0.0 has requirement requests~=2.23.0, but you&#39;ll have requests 2.25.1 which is incompatible.</span>
+<span class="ansi-red-fg">ERROR: google-cloud-bigquery 1.21.0 has requirement google-resumable-media!=0.4.0,&lt;0.5.0dev,&gt;=0.3.1, but you&#39;ll have google-resumable-media 1.3.1 which is incompatible.</span>
+<span class="ansi-red-fg">ERROR: datascience 0.10.6 has requirement folium==0.2.1, but you&#39;ll have folium 0.8.3 which is incompatible.</span>
+<span class="ansi-red-fg">ERROR: tensorflow-cpu 2.4.2 has requirement grpcio~=1.32.0, but you&#39;ll have grpcio 1.34.1 which is incompatible.</span>
+<span class="ansi-red-fg">ERROR: black 20.8b1 has requirement regex&gt;=2020.1.8, but you&#39;ll have regex 2019.12.20 which is incompatible.</span>
+Installing collected packages: tokenizers, tqdm, requests, sacremoses, transformers, setuptools, pathtools, shortuuid, sentry-sdk, docker-pycreds, configparser, smmap, gitdb, GitPython, subprocess32, wandb, einops, cryptography, pynacl, bcrypt, paramiko, pathlib2, invoke, fabric, chex, optax, redis, opencensus-context, opencensus, colorama, blessings, gpustat, py-spy, async-timeout, hiredis, aioredis, multidict, yarl, aiohttp, aiohttp-cors, colorful, ray, tensorflow-estimator, h5py, gast, tensorflow-cpu, google-crc32c, google-resumable-media, google-cloud-core, google-cloud-storage, func-timeout, ftfy, jmp, dm-haiku, typed-ast, pathspec, mypy-extensions, black, rehash, best-download, huggingface-hub, xxhash, fsspec, datasets, threadpoolctl, scikit-learn, sqlitedict, mbstrdecoder, typepy, DataProperty, tabledata, tcolorpy, msgfy, pathvalidate, pytablewriter, portalocker, sacrebleu, pycountry, numexpr, jsonlines, ujson, zstandard, lm-dataformat, pluggy, pytest, pybind11, tqdm-multiprocess, mock, openai, lm-eval-harness
+  Found existing installation: tqdm 4.41.1
+    Uninstalling tqdm-4.41.1:
+      Successfully uninstalled tqdm-4.41.1
+  Found existing installation: requests 2.23.0
+    Uninstalling requests-2.23.0:
+      Successfully uninstalled requests-2.23.0
+  Found existing installation: setuptools 57.0.0
+    Uninstalling setuptools-57.0.0:
+      Successfully uninstalled setuptools-57.0.0
+  Found existing installation: tensorflow-estimator 2.5.0
+    Uninstalling tensorflow-estimator-2.5.0:
+      Successfully uninstalled tensorflow-estimator-2.5.0
+  Found existing installation: h5py 3.1.0
+    Uninstalling h5py-3.1.0:
+      Successfully uninstalled h5py-3.1.0
+  Found existing installation: gast 0.4.0
+    Uninstalling gast-0.4.0:
+      Successfully uninstalled gast-0.4.0
+  Found existing installation: google-resumable-media 0.4.1
+    Uninstalling google-resumable-media-0.4.1:
+      Successfully uninstalled google-resumable-media-0.4.1
+  Found existing installation: google-cloud-core 1.0.3
+    Uninstalling google-cloud-core-1.0.3:
+      Successfully uninstalled google-cloud-core-1.0.3
+  Found existing installation: google-cloud-storage 1.18.1
+    Uninstalling google-cloud-storage-1.18.1:
+      Successfully uninstalled google-cloud-storage-1.18.1
+  Found existing installation: scikit-learn 0.22.2.post1
+    Uninstalling scikit-learn-0.22.2.post1:
+      Successfully uninstalled scikit-learn-0.22.2.post1
+  Found existing installation: numexpr 2.7.3
+    Uninstalling numexpr-2.7.3:
+      Successfully uninstalled numexpr-2.7.3
+  Found existing installation: pluggy 0.7.1
+    Uninstalling pluggy-0.7.1:
+      Successfully uninstalled pluggy-0.7.1
+  Found existing installation: pytest 3.6.4
+    Uninstalling pytest-3.6.4:
+      Successfully uninstalled pytest-3.6.4
+Successfully installed DataProperty-0.50.1 GitPython-3.1.18 aiohttp-3.7.4.post0 aiohttp-cors-0.7.0 aioredis-1.3.1 async-timeout-3.0.1 bcrypt-3.2.0 best-download-0.0.7 black-20.8b1 blessings-1.7 chex-0.0.7 colorama-0.4.4 colorful-0.5.4 configparser-5.0.2 cryptography-3.4.7 datasets-1.8.0 dm-haiku-0.0.5.dev0 docker-pycreds-0.4.0 einops-0.3.0 fabric-2.6.0 fsspec-2021.6.1 ftfy-6.0.3 func-timeout-4.3.5 gast-0.3.3 gitdb-4.0.7 google-cloud-core-1.7.0 google-cloud-storage-1.36.2 google-crc32c-1.1.2 google-resumable-media-1.3.1 gpustat-0.6.0 h5py-2.10.0 hiredis-2.0.0 huggingface-hub-0.0.12 invoke-1.5.0 jmp-0.0.2 jsonlines-2.0.0 lm-dataformat-0.0.19 lm-eval-harness-0.0.1 mbstrdecoder-1.0.1 mock-4.0.3 msgfy-0.1.0 multidict-5.1.0 mypy-extensions-0.4.3 numexpr-2.7.2 openai-0.6.4 opencensus-0.7.13 opencensus-context-0.1.2 optax-0.0.6 paramiko-2.7.2 pathlib2-2.3.5 pathspec-0.8.1 pathtools-0.1.2 pathvalidate-2.4.1 pluggy-0.13.1 portalocker-2.3.0 py-spy-0.3.7 pybind11-2.6.2 pycountry-20.7.3 pynacl-1.4.0 pytablewriter-0.58.0 pytest-6.2.3 ray-1.2.0 redis-3.5.3 rehash-1.0.0 requests-2.25.1 sacrebleu-1.5.0 sacremoses-0.0.45 scikit-learn-0.24.2 sentry-sdk-1.1.0 setuptools-51.3.3 shortuuid-1.0.1 smmap-4.0.0 sqlitedict-1.6.0 subprocess32-3.5.4 tabledata-1.1.4 tcolorpy-0.1.1 tensorflow-cpu-2.4.2 tensorflow-estimator-2.4.0 threadpoolctl-2.1.0 tokenizers-0.10.3 tqdm-4.45.0 tqdm-multiprocess-0.0.11 transformers-4.4.2 typed-ast-1.4.3 typepy-1.1.5 ujson-4.0.2 wandb-0.10.32 xxhash-2.0.2 yarl-1.6.3 zstandard-0.15.2
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Processing ./mesh-transformer-jax
+Collecting jax==0.2.12
+  Downloading https://files.pythonhosted.org/packages/9a/67/d1a9c94104c559b49bbcb72e9efc33859e982d741ea4902d2a00e66e09d9/jax-0.2.12.tar.gz (590kB)
+     |████████████████████████████████| 593kB 5.0MB/s 
+Requirement already satisfied: numpy&gt;=1.12 in /usr/local/lib/python3.7/dist-packages (from jax==0.2.12) (1.19.5)
+Requirement already satisfied: absl-py in /usr/local/lib/python3.7/dist-packages (from jax==0.2.12) (0.12.0)
+Requirement already satisfied: opt_einsum in /usr/local/lib/python3.7/dist-packages (from jax==0.2.12) (3.3.0)
+Requirement already satisfied: six in /usr/local/lib/python3.7/dist-packages (from absl-py-&gt;jax==0.2.12) (1.15.0)
+Building wheels for collected packages: jax, mesh-transformer
+  Building wheel for jax (setup.py) ... done
+  Created wheel for jax: filename=jax-0.2.12-cp37-none-any.whl size=682484 sha256=53ac265f350e436562876e662f86d231703da981ac2302a092166d01100a67b0
+  Stored in directory: /root/.cache/pip/wheels/cf/00/88/75c2043dff473f58e892c7e6adfd2c44ccefb6111fcc021e5b
+  Building wheel for mesh-transformer (setup.py) ... done
+  Created wheel for mesh-transformer: filename=mesh_transformer-0.0.0-cp37-none-any.whl size=21385 sha256=4949dff819f1a977c108ef6c7167d93fc8859f0d68f6f5b7835a8c5a394b86c4
+  Stored in directory: /root/.cache/pip/wheels/de/a9/d2/2be3e25299342b60fca7965d4e416264ff8b6d8a7e8def76da
+Successfully built jax mesh-transformer
+Installing collected packages: jax, mesh-transformer
+  Found existing installation: jax 0.2.13
+    Uninstalling jax-0.2.13:
+      Successfully uninstalled jax-0.2.13
+Successfully installed jax-0.2.12 mesh-transformer-0.0.0
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+</p>
+    </details>
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Setup-Model">Setup Model<a class="anchor-link" href="#Setup-Model"> </a></h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">requests</span> 
+<span class="kn">from</span> <span class="nn">jax.config</span> <span class="kn">import</span> <span class="n">config</span>
+
+<span class="n">colab_tpu_addr</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;COLAB_TPU_ADDR&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;http://</span><span class="si">{</span><span class="n">colab_tpu_addr</span><span class="si">}</span><span class="s1">:8475/requestversion/tpu_driver0.1_dev20210607&#39;</span>
+<span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+
+<span class="c1"># The following is required to use TPU Driver as JAX&#39;s backend.</span>
+<span class="n">config</span><span class="o">.</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">jax_xla_backend</span> <span class="o">=</span> <span class="s2">&quot;tpu_driver&quot;</span>
+<span class="n">config</span><span class="o">.</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">jax_backend_target</span> <span class="o">=</span> <span class="s2">&quot;grpc://&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;COLAB_TPU_ADDR&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Sometimes the next step errors for some reason, just run it again ¯\_(ツ)_/¯</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">from</span> <span class="nn">jax.experimental</span> <span class="kn">import</span> <span class="n">maps</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">optax</span>
+<span class="kn">import</span> <span class="nn">transformers</span>
+
+<span class="kn">from</span> <span class="nn">mesh_transformer.checkpoint</span> <span class="kn">import</span> <span class="n">read_ckpt</span>
+<span class="kn">from</span> <span class="nn">mesh_transformer.sampling</span> <span class="kn">import</span> <span class="n">nucleaus_sample</span>
+<span class="kn">from</span> <span class="nn">mesh_transformer.transformer_shard</span> <span class="kn">import</span> <span class="n">CausalTransformer</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="mi">28</span><span class="p">,</span>
+  <span class="s2">&quot;d_model&quot;</span><span class="p">:</span> <span class="mi">4096</span><span class="p">,</span>
+  <span class="s2">&quot;n_heads&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+  <span class="s2">&quot;n_vocab&quot;</span><span class="p">:</span> <span class="mi">50400</span><span class="p">,</span>
+  <span class="s2">&quot;norm&quot;</span><span class="p">:</span> <span class="s2">&quot;layernorm&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;pe&quot;</span><span class="p">:</span> <span class="s2">&quot;rotary&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;pe_rotary_dims&quot;</span><span class="p">:</span> <span class="mi">64</span><span class="p">,</span>
+
+  <span class="s2">&quot;seq&quot;</span><span class="p">:</span> <span class="mi">2048</span><span class="p">,</span>
+  <span class="s2">&quot;cores_per_replica&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+  <span class="s2">&quot;per_replica_batch&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">per_replica_batch</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;per_replica_batch&quot;</span><span class="p">]</span>
+<span class="n">cores_per_replica</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;cores_per_replica&quot;</span><span class="p">]</span>
+<span class="n">seq</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s2">&quot;seq&quot;</span><span class="p">]</span>
+
+
+<span class="n">params</span><span class="p">[</span><span class="s2">&quot;sampler&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nucleaus_sample</span>
+
+<span class="c1"># here we &quot;remove&quot; the optimizer parameters from the model (as we don&#39;t need them for inference)</span>
+<span class="n">params</span><span class="p">[</span><span class="s2">&quot;optimizer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">optax</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">mesh_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span> <span class="o">//</span> <span class="n">cores_per_replica</span><span class="p">,</span> <span class="n">cores_per_replica</span><span class="p">)</span>
+<span class="n">devices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">devices</span><span class="p">())</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">mesh_shape</span><span class="p">)</span>
+
+<span class="n">maps</span><span class="o">.</span><span class="n">thread_resources</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">maps</span><span class="o">.</span><span class="n">ResourceEnv</span><span class="p">(</span><span class="n">maps</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span><span class="n">devices</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;dp&#39;</span><span class="p">,</span> <span class="s1">&#39;mp&#39;</span><span class="p">)))</span>
+
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">GPT2TokenizerFast</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s1">&#39;gpt2&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
+
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here we create the network and load the parameters from the downloaded files. Expect this to take around 5 minutes.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">total_batch</span> <span class="o">=</span> <span class="n">per_replica_batch</span> <span class="o">*</span> <span class="n">jax</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span> <span class="o">//</span> <span class="n">cores_per_replica</span>
+
+<span class="n">network</span> <span class="o">=</span> <span class="n">CausalTransformer</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+<span class="n">network</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">read_ckpt</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;step_383500/&quot;</span><span class="p">,</span> <span class="n">devices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">network</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">move_xmap</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">cores_per_replica</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/usr/local/lib/python3.7/dist-packages/jax/experimental/maps.py:412: UserWarning: xmap is an experimental feature and probably has bugs!
+  warn(&#34;xmap is an experimental feature and probably has bugs!&#34;)
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>key shape (8, 2)
+in shape (1, 2048)
+dp 1
+mp 8
+read from disk/gcs in 39.5826s
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Run-Model">Run Model<a class="anchor-link" href="#Run-Model"> </a></h2><p>Finally, we are ready to infer with the model! The first sample takes around a minute due to compilation, but after that it should only take about 10 seconds per sample.</p>
+<p>Feel free to mess with the different sampling parameters (top_p and temp), as well as the length of the generations (gen_len, causes a recompile when changed).</p>
+<p>You can also change other things like per_replica_batch in the previous cells to change how many generations are done in parallel. A larger batch has higher latency but higher throughput when measured in tokens generated/s. This is useful for doing things like best-of-n cherry picking.</p>
+<p><em>Tip for best results: Make sure your prompt does not have any trailing spaces, which tend to confuse the model due to the BPE tokenization used during training.</em></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="k">def</span> <span class="nf">set_css</span><span class="p">():</span>
+  <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">  &lt;style&gt;</span>
+<span class="s1">    pre {</span>
+<span class="s1">        white-space: pre-wrap;</span>
+<span class="s1">    }</span>
+<span class="s1">  &lt;/style&gt;</span>
+<span class="s1">  &#39;&#39;&#39;</span><span class="p">))</span>
+<span class="n">get_ipython</span><span class="p">()</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s1">&#39;pre_run_cell&#39;</span><span class="p">,</span> <span class="n">set_css</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="k">def</span> <span class="nf">infer</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">top_p</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">gen_len</span><span class="o">=</span><span class="mi">512</span><span class="p">):</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+
+    <span class="n">provided_ctx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+    <span class="n">pad_amount</span> <span class="o">=</span> <span class="n">seq</span> <span class="o">-</span> <span class="n">provided_ctx</span>
+
+    <span class="n">padded_tokens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="p">((</span><span class="n">pad_amount</span><span class="p">,</span> <span class="mi">0</span><span class="p">),))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+    <span class="n">batched_tokens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">padded_tokens</span><span class="p">]</span> <span class="o">*</span> <span class="n">total_batch</span><span class="p">)</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">total_batch</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">batched_tokens</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">gen_len</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;top_p&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">total_batch</span><span class="p">)</span> <span class="o">*</span> <span class="n">top_p</span><span class="p">,</span> <span class="s2">&quot;temp&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">total_batch</span><span class="p">)</span> <span class="o">*</span> <span class="n">temp</span><span class="p">})</span>
+
+    <span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">decoded_tokens</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">decoded_tokens</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]:</span>
+      <span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1m</span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="se">\033</span><span class="s2">[0m</span><span class="si">{</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;completion done in </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="si">:</span><span class="s2">06</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">samples</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">infer</span><span class="p">(</span><span class="s2">&quot;EleutherAI is&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+
+  <style>
+    pre {
+        white-space: pre-wrap;
+    }
+  </style>
+  
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>completion done in 62.053035497665405s
+<span class="ansi-bold">EleutherAI is</span> a virus that will scam users to send the user money. It asks you if you want to make a donation. Then the virus claims you paid.
+
+It is recommended you click on the link to see if your real bank has been compromised.
+
+The web site claims the payment is the result of a donation to the Humane Society. This is a scam site.&lt;|endoftext|&gt;Tropical drought threatens water supplies
+
+Demand for water is growing as the human population rises and with that comes a greater need for water. One way to save water is to recycle it. The problem is that the salt left over from the ocean water is not only expensive to remove but, is also extremely corrosive to pipes and other plumbing and it leaves a white stain that won&#39;t wash off. One solution is to have a new home constructed that reuses ocean water in the flush toilets and other parts of the house. If you&#39;re going to build a new home, you should save all the ocean water you can.
+
+It&#39;s a difficult problem because ocean water is hard to come by, so any excess water that is available should be re-used.
+
+&#34;There&#39;s such a great amount of fresh water flowing into the ocean that one of our coastal utilities built a cooling tower to bring the ocean water to a higher temperature, and then steam and the desalination facility takes it to produce fresh water,&#34; said Patricia Drake, a biologist at Salton Sea State Park.
+
+The 6,000 acre park is planning to host the regional summit of the Desalination Facilities Impact Group. The group is organized to encourage local water agencies and municipalities to engage in a deeper discussion about the potential impact of seawater desalination on the local economy and on the quality of life.
+
+The summit will take place Thursday, September 7 in Imperial Beach at the Desalination Awareness Group at 1675 Mission Street. It starts at 9:30 a.m.
+
+The group wants to inform the public about the critical importance of water and what is at stake.
+
+&#34;Desalination plants are necessary as a measure of last resort,&#34; said Rick Barrett, the Imperial Beach city manager. &#34;Desalination uses up less fresh water than potable (drinking) water, thus less fresh water for people, agriculture, ecosystems and other aspects of life in Southern California and beyond.&#34;
+
+The summit will include a panel discussion on ocean-warming trends and the potential for sea water desalination, including the pros and cons of different
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">top_p</span> <span class="o">=</span> <span class="mf">0.9</span> <span class="c1">#@param {type:&quot;slider&quot;, min:0, max:1, step:0.1}</span>
+<span class="n">temp</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#@param {type:&quot;slider&quot;, min:0, max:1, step:0.1}</span>
+
+<span class="n">context</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;In a shocking finding, scientist discovered a herd of unicorns living in a remote, previously unexplored valley, in the Andes Mountains. Even more surprising to the researchers was the fact that the unicorns spoke perfect English.&quot;&quot;&quot;</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">infer</span><span class="p">(</span><span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="n">temp</span><span class="p">,</span> <span class="n">gen_len</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea ">
+
+  <style>
+    pre {
+        white-space: pre-wrap;
+    }
+  </style>
+  
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>completion done in 13.531432867050171s
+<span class="ansi-bold">In a shocking finding, scientist discovered a herd of unicorns living in a remote, previously unexplored valley, in the Andes Mountains. Even more surprising to the researchers was the fact that the unicorns spoke perfect English.</span> In this episode of Infographics Minute, find out how many unicorns there are, who the leader is, and what it’s like to be a unicorn.
+
+Researchers from Peru and Bolivia found the unicorns, who they named Yana&#39;unicorn, in 2014. Yana&#39;unicorn is thought to be a hybrid of two other animals: the guanaco and the viscacha. Some have even suggested that Yana&#39;unicorn could be the ancestor of both these animals. There&#39;s also a chance that it could be related to some other species, but, so far, researchers have yet to discover them.
+
+The official name for these animals is Yana&#39;unicorn (a combination of the words &#39;Yana&#39; and &#39;unicorn&#39;). However, some people call them &#39;Macho Nefertiti&#39;, after the legendary unicorns from the mythology of the Egyptians. In order to protect the people who live in the area from the shy creatures, hunters usually bring them down with tranquilizer darts.
+
+In 2016, the research team – lead by Dr. Manuel Solorzano – calculated that there are 924 unicorns living in the area. Scientists found out that the unicorns live in a valley in the Andes Mountains, which is approximately 4.3 miles long and 1.8 miles wide. These animals live in groups of 50 to 200 individuals.
+
+Also read: List of 25 incredible earth facts that will blow your mind
+
+Yana&#39;unicorn are very shy. They usually lie low and don&#39;t come out from their hiding places until they are chased away by hunters. As for their diet, researchers have yet to discover it. They also have the tendency to vocalize their territories, although they don&#39;t usually make a lot of noise.
+
+Even though they are very shy, they can be very aggressive towards other animals. In April 2016, some villagers in the Andes were attacked by unicorns that had been attacked by packs of wild dogs.
+
+Since their discovery, scientists have been tracking the unicorns for almost four years. For this reason, they have their own observation posts in the area. One of these posts is located in a little bar called ‘Andesito’.
+
+To be able to capture video footage of the Yana&#39;unicorn, scientists have had to modify their vehicle. They used a radio-controlled quadcopter drone. These drones can remain active for long periods of time without requiring any fuel.
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+<script type="application/vnd.jupyter.widget-state+json">
+{"4069007444944a33a66e95a11f465f64": {"model_module": "@jupyter-widgets/controls", "model_name": "HBoxModel", "state": {"_view_name": "HBoxView", "_dom_classes": [], "_model_name": "HBoxModel", "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.5.0", "box_style": "", "layout": "IPY_MODEL_aea382b1ff5247779de887251ee11a6c", "_model_module": "@jupyter-widgets/controls", "children": ["IPY_MODEL_fbdbb24a7764448a9400466c3f6631e6", "IPY_MODEL_64564aa4784f4af1aa92b9361aa19991"]}}, "aea382b1ff5247779de887251ee11a6c": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}, "fbdbb24a7764448a9400466c3f6631e6": {"model_module": "@jupyter-widgets/controls", "model_name": "FloatProgressModel", "state": {"_view_name": "ProgressView", "style": "IPY_MODEL_28a3ebd361384a85aa8d686bf10f3cb1", "_dom_classes": [], "description": "Downloading: 100%", "_model_name": "FloatProgressModel", "bar_style": "success", "max": 1042301, "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "value": 1042301, "_view_count": null, "_view_module_version": "1.5.0", "orientation": "horizontal", "min": 0, "description_tooltip": null, "_model_module": "@jupyter-widgets/controls", "layout": "IPY_MODEL_a4b4381c6a8b4697aca274a46e0fd2fd"}}, "64564aa4784f4af1aa92b9361aa19991": {"model_module": "@jupyter-widgets/controls", "model_name": "HTMLModel", "state": {"_view_name": "HTMLView", "style": "IPY_MODEL_9550a08f3e624dbd9550174e282bc1bd", "_dom_classes": [], "description": "", "_model_name": "HTMLModel", "placeholder": "\u200b", "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "value": " 1.04M/1.04M [00:05&lt;00:00, 195kB/s]", "_view_count": null, "_view_module_version": "1.5.0", "description_tooltip": null, "_model_module": "@jupyter-widgets/controls", "layout": "IPY_MODEL_636bdb3b9ffc4bb5aec73c33fc8b5293"}}, "28a3ebd361384a85aa8d686bf10f3cb1": {"model_module": "@jupyter-widgets/controls", "model_name": "ProgressStyleModel", "state": {"_view_name": "StyleView", "_model_name": "ProgressStyleModel", "description_width": "initial", "_view_module": "@jupyter-widgets/base", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.2.0", "bar_color": null, "_model_module": "@jupyter-widgets/controls"}}, "a4b4381c6a8b4697aca274a46e0fd2fd": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}, "9550a08f3e624dbd9550174e282bc1bd": {"model_module": "@jupyter-widgets/controls", "model_name": "DescriptionStyleModel", "state": {"_view_name": "StyleView", "_model_name": "DescriptionStyleModel", "description_width": "", "_view_module": "@jupyter-widgets/base", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.2.0", "_model_module": "@jupyter-widgets/controls"}}, "636bdb3b9ffc4bb5aec73c33fc8b5293": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}, "5468467707434c58906a6c5d92f25392": {"model_module": "@jupyter-widgets/controls", "model_name": "HBoxModel", "state": {"_view_name": "HBoxView", "_dom_classes": [], "_model_name": "HBoxModel", "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.5.0", "box_style": "", "layout": "IPY_MODEL_6a871d783c134457aa87d808e08a95e6", "_model_module": "@jupyter-widgets/controls", "children": ["IPY_MODEL_c401c975f70c4423ad16ce9e155c28bd", "IPY_MODEL_d112be781d38488a9dc094acf861c324"]}}, "6a871d783c134457aa87d808e08a95e6": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}, "c401c975f70c4423ad16ce9e155c28bd": {"model_module": "@jupyter-widgets/controls", "model_name": "FloatProgressModel", "state": {"_view_name": "ProgressView", "style": "IPY_MODEL_f71648309b0d4403a4dca2f11593f480", "_dom_classes": [], "description": "Downloading: 100%", "_model_name": "FloatProgressModel", "bar_style": "success", "max": 456318, "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "value": 456318, "_view_count": null, "_view_module_version": "1.5.0", "orientation": "horizontal", "min": 0, "description_tooltip": null, "_model_module": "@jupyter-widgets/controls", "layout": "IPY_MODEL_69a1ca3b1de445f4a52cb2e6dd27a5bc"}}, "d112be781d38488a9dc094acf861c324": {"model_module": "@jupyter-widgets/controls", "model_name": "HTMLModel", "state": {"_view_name": "HTMLView", "style": "IPY_MODEL_36ecfd0510f249288c7c20e82ee622ce", "_dom_classes": [], "description": "", "_model_name": "HTMLModel", "placeholder": "\u200b", "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "value": " 456k/456k [00:04&lt;00:00, 94.1kB/s]", "_view_count": null, "_view_module_version": "1.5.0", "description_tooltip": null, "_model_module": "@jupyter-widgets/controls", "layout": "IPY_MODEL_90953eb5c54542b09e308a15e8894f61"}}, "f71648309b0d4403a4dca2f11593f480": {"model_module": "@jupyter-widgets/controls", "model_name": "ProgressStyleModel", "state": {"_view_name": "StyleView", "_model_name": "ProgressStyleModel", "description_width": "initial", "_view_module": "@jupyter-widgets/base", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.2.0", "bar_color": null, "_model_module": "@jupyter-widgets/controls"}}, "69a1ca3b1de445f4a52cb2e6dd27a5bc": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}, "36ecfd0510f249288c7c20e82ee622ce": {"model_module": "@jupyter-widgets/controls", "model_name": "DescriptionStyleModel", "state": {"_view_name": "StyleView", "_model_name": "DescriptionStyleModel", "description_width": "", "_view_module": "@jupyter-widgets/base", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.2.0", "_model_module": "@jupyter-widgets/controls"}}, "90953eb5c54542b09e308a15e8894f61": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}, "93cdb3b6ccf44b5dab4b841825335ea9": {"model_module": "@jupyter-widgets/controls", "model_name": "HBoxModel", "state": {"_view_name": "HBoxView", "_dom_classes": [], "_model_name": "HBoxModel", "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.5.0", "box_style": "", "layout": "IPY_MODEL_fa3e3fc1bbf54fafb81bf51f0ee8634d", "_model_module": "@jupyter-widgets/controls", "children": ["IPY_MODEL_c33edfedf7034676b092aaf5dedc8016", "IPY_MODEL_bfa0975c74f74e568061424ddde29e6e"]}}, "fa3e3fc1bbf54fafb81bf51f0ee8634d": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}, "c33edfedf7034676b092aaf5dedc8016": {"model_module": "@jupyter-widgets/controls", "model_name": "FloatProgressModel", "state": {"_view_name": "ProgressView", "style": "IPY_MODEL_2400969047af4af3ae29e6701661fcd0", "_dom_classes": [], "description": "Downloading: 100%", "_model_name": "FloatProgressModel", "bar_style": "success", "max": 1355256, "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "value": 1355256, "_view_count": null, "_view_module_version": "1.5.0", "orientation": "horizontal", "min": 0, "description_tooltip": null, "_model_module": "@jupyter-widgets/controls", "layout": "IPY_MODEL_24f2ea0227034d86a9a427553dcc71fb"}}, "bfa0975c74f74e568061424ddde29e6e": {"model_module": "@jupyter-widgets/controls", "model_name": "HTMLModel", "state": {"_view_name": "HTMLView", "style": "IPY_MODEL_946c7093e8b94b26956d1964c67020dd", "_dom_classes": [], "description": "", "_model_name": "HTMLModel", "placeholder": "\u200b", "_view_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "value": " 1.36M/1.36M [00:04&lt;00:00, 301kB/s]", "_view_count": null, "_view_module_version": "1.5.0", "description_tooltip": null, "_model_module": "@jupyter-widgets/controls", "layout": "IPY_MODEL_41c96dff95fa4fd1917d0ce24c67b63a"}}, "2400969047af4af3ae29e6701661fcd0": {"model_module": "@jupyter-widgets/controls", "model_name": "ProgressStyleModel", "state": {"_view_name": "StyleView", "_model_name": "ProgressStyleModel", "description_width": "initial", "_view_module": "@jupyter-widgets/base", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.2.0", "bar_color": null, "_model_module": "@jupyter-widgets/controls"}}, "24f2ea0227034d86a9a427553dcc71fb": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}, "946c7093e8b94b26956d1964c67020dd": {"model_module": "@jupyter-widgets/controls", "model_name": "DescriptionStyleModel", "state": {"_view_name": "StyleView", "_model_name": "DescriptionStyleModel", "description_width": "", "_view_module": "@jupyter-widgets/base", "_model_module_version": "1.5.0", "_view_count": null, "_view_module_version": "1.2.0", "_model_module": "@jupyter-widgets/controls"}}, "41c96dff95fa4fd1917d0ce24c67b63a": {"model_module": "@jupyter-widgets/base", "model_name": "LayoutModel", "state": {"_view_name": "LayoutView", "grid_template_rows": null, "right": null, "justify_content": null, "_view_module": "@jupyter-widgets/base", "overflow": null, "_model_module_version": "1.2.0", "_view_count": null, "flex_flow": null, "width": null, "min_width": null, "border": null, "align_items": null, "bottom": null, "_model_module": "@jupyter-widgets/base", "top": null, "grid_column": null, "overflow_y": null, "overflow_x": null, "grid_auto_flow": null, "grid_area": null, "grid_template_columns": null, "flex": null, "_model_name": "LayoutModel", "justify_items": null, "grid_row": null, "max_height": null, "align_content": null, "visibility": null, "align_self": null, "height": null, "min_height": null, "padding": null, "grid_auto_rows": null, "grid_gap": null, "max_width": null, "order": null, "_view_module_version": "1.2.0", "grid_template_areas": null, "object_position": null, "object_fit": null, "grid_auto_columns": null, "margin": null, "display": null, "left": null}}}
+</script>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="joaorafaelm/notebook"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+</script>
+<a class="u-url" href="/notebook/gpt-j/2021/06/24/GPT_J_6B_Inference_Demo.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/notebook/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/notebook/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/notebook/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/joaorafaelm" title="joaorafaelm"><svg class="svg-icon grey"><use xlink:href="/notebook/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
