@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Generate images from text prompts with VQGAN and CLIP | 📝</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Generate images from text prompts with VQGAN and CLIP" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://joaorafaelm.github.io/notebook/vqgan/clip/2021/08/14/vqgan-and-clip.html" />
+<meta property="og:url" content="https://joaorafaelm.github.io/notebook/vqgan/clip/2021/08/14/vqgan-and-clip.html" />
+<meta property="og:site_name" content="📝" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-08-14T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://joaorafaelm.github.io/notebook/vqgan/clip/2021/08/14/vqgan-and-clip.html","@type":"BlogPosting","headline":"Generate images from text prompts with VQGAN and CLIP","dateModified":"2021-08-14T00:00:00-05:00","datePublished":"2021-08-14T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://joaorafaelm.github.io/notebook/vqgan/clip/2021/08/14/vqgan-and-clip.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/notebook/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://joaorafaelm.github.io/notebook/feed.xml" title="📝" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-104187041-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-104187041-1');
+</script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/notebook/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/notebook/">📝</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/notebook/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Generate images from text prompts with VQGAN and CLIP</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-08-14T00:00:00-05:00" itemprop="datePublished">
+        Aug 14, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      11 min read
+    
+</span>
+      <span class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/notebook/categories/#vqgan">vqgan</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/notebook/categories/#clip">clip</a>
+        
+      
+      </span>
+    
+
+    </p>
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-left badges">
+          <div class="px-2">
+
+    <a href="https://github.com/joaorafaelm/notebook/tree/master/_notebooks/2021-08-14-vqgan-and-clip.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/notebook/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/joaorafaelm/notebook/blob/master/_notebooks/2021-08-14-vqgan-and-clip.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/notebook/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2021-08-14-vqgan-and-clip.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Originally made by Katherine Crowson (<a href="https://github.com/crowsonkb">https://github.com/crowsonkb</a>, <a href="https://twitter.com/RiversHaveWings">https://twitter.com/RiversHaveWings</a>). The original BigGAN+CLIP method was by <a href="https://twitter.com/advadnoun">https://twitter.com/advadnoun</a>.
+ Added some explanations and modifications by Eleiber#8347, pooling trick by Crimeacs#8222 (<a href="https://twitter.com/EarthML1">https://twitter.com/EarthML1</a>) and the GUI was made with the help of Abulafia#3734.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="c1"># Copyright (c) 2021 Katherine Crowson</span>
+
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+
+<span class="c1"># The above copyright notice and this permission notice shall be included in</span>
+<span class="c1"># all copies or substantial portions of the Software.</span>
+
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</span>
+<span class="c1"># THE SOFTWARE.</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="err">!</span><span class="n">nvidia</span><span class="o">-</span><span class="n">smi</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="err">!</span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">openai</span><span class="o">/</span><span class="n">CLIP</span>
+<span class="c1"># !pip install taming-transformers</span>
+<span class="err">!</span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">CompVis</span><span class="o">/</span><span class="n">taming</span><span class="o">-</span><span class="n">transformers</span><span class="o">.</span><span class="n">git</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">ftfy</span> <span class="n">regex</span> <span class="n">tqdm</span> <span class="n">omegaconf</span> <span class="n">pytorch</span><span class="o">-</span><span class="n">lightning</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">kornia</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">imageio</span><span class="o">-</span><span class="n">ffmpeg</span>   
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">einops</span>          
+<span class="err">!</span><span class="n">mkdir</span> <span class="n">steps</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>By default, the notebook downloads the 1024 and 16384 models from ImageNet. There are others like COCO-Stuff, WikiArt or S-FLCKR, which are heavy, and if you are not going to use them it would be useless to download them, so if you want to use them, simply remove the numerals at the beginning of the lines depending on the model you want (the model name is at the end of the lines).</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="c1">#@markdown By default, the notebook downloads the 1024 and 16384 models from ImageNet. There are others like COCO-Stuff, WikiArt 1024, WikiArt 16384, FacesHQ or S-FLCKR, which are heavy, and if you are not going to use them it would be pointless to download them, so if you want to use them, simply select the models to download.</span>
+
+<span class="n">imagenet_1024</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="n">imagenet_16384</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="n">coco</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="n">faceshq</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="n">wikiart_1024</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="n">wikiart_16384</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="n">sflckr</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+<span class="n">openimages_8192</span> <span class="o">=</span> <span class="kc">False</span> <span class="c1">#@param {type:&quot;boolean&quot;}</span>
+
+<span class="k">if</span> <span class="n">imagenet_1024</span><span class="p">:</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">vqgan_imagenet_f16_1024</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;http://mirror.io.community/blob/vqgan/vqgan_imagenet_f16_1024.yaml&#39;</span> <span class="c1">#ImageNet 1024</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">vqgan_imagenet_f16_1024</span><span class="o">.</span><span class="n">ckpt</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;http://mirror.io.community/blob/vqgan/vqgan_imagenet_f16_1024.ckpt&#39;</span>  <span class="c1">#ImageNet 1024</span>
+<span class="k">if</span> <span class="n">imagenet_16384</span><span class="p">:</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">vqgan_imagenet_f16_16384</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;http://mirror.io.community/blob/vqgan/vqgan_imagenet_f16_16384.yaml&#39;</span> <span class="c1">#ImageNet 16384</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">vqgan_imagenet_f16_16384</span><span class="o">.</span><span class="n">ckpt</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;http://mirror.io.community/blob/vqgan/vqgan_imagenet_f16_16384.ckpt&#39;</span> <span class="c1">#ImageNet 16384</span>
+<span class="k">if</span> <span class="n">openimages_8192</span><span class="p">:</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">vqgan_openimages_f16_8192</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;https://heibox.uni-heidelberg.de/d/2e5662443a6b4307b470/files/?p=</span><span class="si">%2F</span><span class="s1">configs</span><span class="si">%2F</span><span class="s1">model.yaml&amp;dl=1&#39;</span> <span class="c1">#ImageNet 16384</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">vqgan_openimages_f16_8192</span><span class="o">.</span><span class="n">ckpt</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;https://heibox.uni-heidelberg.de/d/2e5662443a6b4307b470/files/?p=</span><span class="si">%2F</span><span class="s1">ckpts</span><span class="si">%2F</span><span class="s1">last.ckpt&amp;dl=1&#39;</span> <span class="c1">#ImageNet 16384</span>
+
+<span class="k">if</span> <span class="n">coco</span><span class="p">:</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">coco</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;https://dl.nmkd.de/ai/clip/coco/coco.yaml&#39;</span> <span class="c1">#COCO</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">coco</span><span class="o">.</span><span class="n">ckpt</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;https://dl.nmkd.de/ai/clip/coco/coco.ckpt&#39;</span> <span class="c1">#COCO</span>
+<span class="k">if</span> <span class="n">faceshq</span><span class="p">:</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">faceshq</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;https://drive.google.com/uc?export=download&amp;id=1fHwGx_hnBtC8nsq7hesJvs-Klv-P0gzT&#39;</span> <span class="c1">#FacesHQ</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">faceshq</span><span class="o">.</span><span class="n">ckpt</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;https://app.koofr.net/content/links/a04deec9-0c59-4673-8b37-3d696fe63a5d/files/get/last.ckpt?path=</span><span class="si">%2F</span><span class="s1">2020-11-13T21-41-45_faceshq_transformer</span><span class="si">%2F</span><span class="s1">checkpoints</span><span class="si">%2F</span><span class="s1">last.ckpt&#39;</span> <span class="c1">#FacesHQ</span>
+<span class="k">if</span> <span class="n">wikiart_1024</span><span class="p">:</span> 
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">wikiart_1024</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;http://mirror.io.community/blob/vqgan/wikiart.yaml&#39;</span> <span class="c1">#WikiArt 1024</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">wikiart_1024</span><span class="o">.</span><span class="n">ckpt</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;http://mirror.io.community/blob/vqgan/wikiart.ckpt&#39;</span> <span class="c1">#WikiArt 1024</span>
+<span class="k">if</span> <span class="n">wikiart_16384</span><span class="p">:</span> 
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">wikiart_16384</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;http://mirror.io.community/blob/vqgan/wikiart_16384.yaml&#39;</span> <span class="c1">#WikiArt 16384</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">wikiart_16384</span><span class="o">.</span><span class="n">ckpt</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;http://mirror.io.community/blob/vqgan/wikiart_16384.ckpt&#39;</span> <span class="c1">#WikiArt 16384</span>
+<span class="k">if</span> <span class="n">sflckr</span><span class="p">:</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">sflckr</span><span class="o">.</span><span class="n">yaml</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/files/?p=</span><span class="si">%2F</span><span class="s1">configs</span><span class="si">%2F</span><span class="s1">2020-11-09T13-31-51-project.yaml&amp;dl=1&#39;</span> <span class="c1">#S-FLCKR</span>
+  <span class="err">!</span><span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="o">-</span><span class="n">o</span> <span class="n">sflckr</span><span class="o">.</span><span class="n">ckpt</span> <span class="o">-</span><span class="n">C</span> <span class="o">-</span> <span class="s1">&#39;https://heibox.uni-heidelberg.de/d/73487ab6e5314cb5adba/files/?p=</span><span class="si">%2F</span><span class="s1">checkpoints</span><span class="si">%2F</span><span class="s1">last.ckpt&amp;dl=1&#39;</span> <span class="c1">#S-FLCKR</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;/content/taming-transformers&#39;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">IPython</span> <span class="kn">import</span> <span class="n">display</span>
+<span class="kn">from</span> <span class="nn">base64</span> <span class="kn">import</span> <span class="n">b64encode</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">OmegaConf</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">taming.models</span> <span class="kn">import</span> <span class="n">cond_transformer</span><span class="p">,</span> <span class="n">vqgan</span>
+<span class="kn">import</span> <span class="nn">taming.modules</span> 
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
+<span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">TF</span>
+<span class="kn">from</span> <span class="nn">tqdm.notebook</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">CLIP</span> <span class="kn">import</span> <span class="n">clip</span>
+<span class="kn">import</span> <span class="nn">kornia.augmentation</span> <span class="k">as</span> <span class="nn">K</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">imageio</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">ImageFile</span><span class="p">,</span> <span class="n">Image</span>
+<span class="n">ImageFile</span><span class="o">.</span><span class="n">LOAD_TRUNCATED_IMAGES</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="k">def</span> <span class="nf">sinc</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">new_ones</span><span class="p">([]))</span>
+
+
+<span class="k">def</span> <span class="nf">lanczos</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+    <span class="n">cond</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="o">-</span><span class="n">a</span> <span class="o">&lt;</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">a</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">cond</span><span class="p">,</span> <span class="n">sinc</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">sinc</span><span class="p">(</span><span class="n">x</span><span class="o">/</span><span class="n">a</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">([]))</span>
+    <span class="k">return</span> <span class="n">out</span> <span class="o">/</span> <span class="n">out</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">ramp</span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">ratio</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="n">n</span><span class="p">])</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cur</span>
+        <span class="n">cur</span> <span class="o">+=</span> <span class="n">ratio</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="o">-</span><span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">flip</span><span class="p">([</span><span class="mi">0</span><span class="p">]),</span> <span class="n">out</span><span class="p">])[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">resample</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">dh</span><span class="p">,</span> <span class="n">dw</span> <span class="o">=</span> <span class="n">size</span>
+
+    <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">([</span><span class="n">n</span> <span class="o">*</span> <span class="n">c</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">dh</span> <span class="o">&lt;</span> <span class="n">h</span><span class="p">:</span>
+        <span class="n">kernel_h</span> <span class="o">=</span> <span class="n">lanczos</span><span class="p">(</span><span class="n">ramp</span><span class="p">(</span><span class="n">dh</span> <span class="o">/</span> <span class="n">h</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">pad_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel_h</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pad_h</span><span class="p">,</span> <span class="n">pad_h</span><span class="p">),</span> <span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">kernel_h</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">dw</span> <span class="o">&lt;</span> <span class="n">w</span><span class="p">:</span>
+        <span class="n">kernel_w</span> <span class="o">=</span> <span class="n">lanczos</span><span class="p">(</span><span class="n">ramp</span><span class="p">(</span><span class="n">dw</span> <span class="o">/</span> <span class="n">w</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">pad_w</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel_w</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="p">(</span><span class="n">pad_w</span><span class="p">,</span> <span class="n">pad_w</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;reflect&#39;</span><span class="p">)</span>
+        <span class="nb">input</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">kernel_w</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:])</span>
+
+    <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">view</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;bicubic&#39;</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="n">align_corners</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ReplaceGrad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">x_forward</span><span class="p">,</span> <span class="n">x_backward</span><span class="p">):</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">x_backward</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">return</span> <span class="n">x_forward</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_in</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">grad_in</span><span class="o">.</span><span class="n">sum_to_size</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+
+<span class="n">replace_grad</span> <span class="o">=</span> <span class="n">ReplaceGrad</span><span class="o">.</span><span class="n">apply</span>
+
+
+<span class="k">class</span> <span class="nc">ClampWithGrad</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span class="n">Function</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">):</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="nb">min</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span>
+        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">input</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_in</span><span class="p">):</span>
+        <span class="nb">input</span><span class="p">,</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
+        <span class="k">return</span> <span class="n">grad_in</span> <span class="o">*</span> <span class="p">(</span><span class="n">grad_in</span> <span class="o">*</span> <span class="p">(</span><span class="nb">input</span> <span class="o">-</span> <span class="nb">input</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">ctx</span><span class="o">.</span><span class="n">max</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="n">clamp_with_grad</span> <span class="o">=</span> <span class="n">ClampWithGrad</span><span class="o">.</span><span class="n">apply</span>
+
+
+<span class="k">def</span> <span class="nf">vector_quantize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">codebook</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">codebook</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">x</span> <span class="o">@</span> <span class="n">codebook</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">x_q</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">codebook</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">@</span> <span class="n">codebook</span>
+    <span class="k">return</span> <span class="n">replace_grad</span><span class="p">(</span><span class="n">x_q</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Prompt</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">)):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;embed&#39;</span><span class="p">,</span> <span class="n">embed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">weight</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span><span class="n">stop</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">input_normed</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">embed_normed</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embed</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">input_normed</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">embed_normed</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">arcsin</span><span class="p">()</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="n">dists</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">sign</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">*</span> <span class="n">replace_grad</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">parse_prompt</span><span class="p">(</span><span class="n">prompt</span><span class="p">):</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">prompt</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;-inf&#39;</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">):]</span>
+    <span class="k">return</span> <span class="n">vals</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+
+<span class="k">class</span> <span class="nc">MakeCutouts</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cut_size</span><span class="p">,</span> <span class="n">cutn</span><span class="p">,</span> <span class="n">cut_pow</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cut_size</span> <span class="o">=</span> <span class="n">cut_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cutn</span> <span class="o">=</span> <span class="n">cutn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cut_pow</span> <span class="o">=</span> <span class="n">cut_pow</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">augs</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="c1"># K.RandomHorizontalFlip(p=0.5),</span>
+            <span class="c1"># K.RandomVerticalFlip(p=0.5),</span>
+            <span class="c1"># K.RandomSolarize(0.01, 0.01, p=0.7),</span>
+            <span class="c1"># K.RandomSharpness(0.3,p=0.4),</span>
+            <span class="c1"># K.RandomResizedCrop(size=(self.cut_size,self.cut_size), scale=(0.1,1),  ratio=(0.75,1.333), cropping_mode=&#39;resample&#39;, p=0.5),</span>
+            <span class="c1"># K.RandomCrop(size=(self.cut_size,self.cut_size), p=0.5),</span>
+            <span class="n">K</span><span class="o">.</span><span class="n">RandomAffine</span><span class="p">(</span><span class="n">degrees</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">translate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">padding_mode</span><span class="o">=</span><span class="s1">&#39;border&#39;</span><span class="p">),</span>
+            <span class="n">K</span><span class="o">.</span><span class="n">RandomPerspective</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span><span class="n">p</span><span class="o">=</span><span class="mf">0.7</span><span class="p">),</span>
+            <span class="n">K</span><span class="o">.</span><span class="n">ColorJitter</span><span class="p">(</span><span class="n">hue</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">saturation</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.7</span><span class="p">),</span>
+            <span class="n">K</span><span class="o">.</span><span class="n">RandomErasing</span><span class="p">((</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/.</span><span class="mi">3</span><span class="p">),</span> <span class="n">same_on_batch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.7</span><span class="p">),</span>
+            
+<span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noise_fac</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">av_pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">AdaptiveAvgPool2d</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">cut_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_size</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_pool</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">AdaptiveMaxPool2d</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">cut_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_size</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="n">sideY</span><span class="p">,</span> <span class="n">sideX</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">max_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sideX</span><span class="p">,</span> <span class="n">sideY</span><span class="p">)</span>
+        <span class="n">min_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sideX</span><span class="p">,</span> <span class="n">sideY</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cut_size</span><span class="p">)</span>
+        <span class="n">cutouts</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutn</span><span class="p">):</span>
+
+            <span class="c1"># size = int(torch.rand([])**self.cut_pow * (max_size - min_size) + min_size)</span>
+            <span class="c1"># offsetx = torch.randint(0, sideX - size + 1, ())</span>
+            <span class="c1"># offsety = torch.randint(0, sideY - size + 1, ())</span>
+            <span class="c1"># cutout = input[:, :, offsety:offsety + size, offsetx:offsetx + size]</span>
+            <span class="c1"># cutouts.append(resample(cutout, (self.cut_size, self.cut_size)))</span>
+
+            <span class="c1"># cutout = transforms.Resize(size=(self.cut_size, self.cut_size))(input)</span>
+            
+            <span class="n">cutout</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">av_pool</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_pool</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span><span class="o">/</span><span class="mi">2</span>
+            <span class="n">cutouts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cutout</span><span class="p">)</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">augs</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">cutouts</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_fac</span><span class="p">:</span>
+            <span class="n">facs</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">new_empty</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">cutn</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">uniform_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_fac</span><span class="p">)</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="n">batch</span> <span class="o">+</span> <span class="n">facs</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">batch</span>
+
+
+<span class="k">def</span> <span class="nf">load_vqgan_model</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">):</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;taming.models.vqgan.VQModel&#39;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">vqgan</span><span class="o">.</span><span class="n">VQModel</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">init_from_ckpt</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;taming.models.vqgan.GumbelVQ&#39;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">vqgan</span><span class="o">.</span><span class="n">GumbelVQ</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">init_from_ckpt</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">target</span> <span class="o">==</span> <span class="s1">&#39;taming.models.cond_transformer.Net2NetTransformer&#39;</span><span class="p">:</span>
+        <span class="n">parent_model</span> <span class="o">=</span> <span class="n">cond_transformer</span><span class="o">.</span><span class="n">Net2NetTransformer</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">parent_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">parent_model</span><span class="o">.</span><span class="n">init_from_ckpt</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">parent_model</span><span class="o">.</span><span class="n">first_stage_model</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;unknown model type: </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">target</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">del</span> <span class="n">model</span><span class="o">.</span><span class="n">loss</span>
+    <span class="k">return</span> <span class="n">model</span>
+
+
+<span class="k">def</span> <span class="nf">resize_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">out_size</span><span class="p">):</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">out_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">out_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">area</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span><span class="p">),</span> <span class="nb">round</span><span class="p">((</span><span class="n">area</span> <span class="o">/</span> <span class="n">ratio</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">image</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">LANCZOS</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Settings-for-this-run:">Settings for this run:<a class="anchor-link" href="#Settings-for-this-run:"> </a></h2><p>Mainly what you will have to modify will be <code>texts:</code>, there you can place the text or texts you want to generate (separated with <code>|</code>). It is a list because you can put more than one text, and so the AI ​​tries to 'mix' the images, giving the same priority to both texts.</p>
+<p>To use an initial image to the model, you just have to upload a file to the Colab environment (in the section on the left), and then modify <code>init_image:</code> putting the exact name of the file. Example: <code>sample.png</code></p>
+<p>You can also modify the model by changing the lines that say <code>model:</code>. Currently ImageNet 1024, ImageNet 16384, WikiArt 1024, WikiArt 16384, S-FLCKR and COCO-Stuff are available. To activate them you have to have downloaded them first, and then you can simply select it.</p>
+<p>You can also use <code>target_images</code>, which is basically putting one or more images on it that the AI ​​will take as a "target", fulfilling the same function as putting text on it. To put more than one you have to use <code>|</code> as a separator.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">texts</span> <span class="o">=</span> <span class="s2">&quot;xvilas&quot;</span> <span class="c1">#@param {type:&quot;string&quot;}</span>
+<span class="n">width</span> <span class="o">=</span>  <span class="mi">600</span><span class="c1">#@param {type:&quot;number&quot;}</span>
+<span class="n">height</span> <span class="o">=</span> <span class="mi">600</span><span class="c1">#@param {type:&quot;number&quot;}</span>
+<span class="n">model</span> <span class="o">=</span> <span class="s2">&quot;vqgan_imagenet_f16_16384&quot;</span> <span class="c1">#@param [&quot;vqgan_imagenet_f16_16384&quot;, &quot;vqgan_imagenet_f16_1024&quot;, &quot;vqgan_openimages_f16_8192&quot;, &quot;wikiart_1024&quot;, &quot;wikiart_16384&quot;, &quot;coco&quot;, &quot;faceshq&quot;, &quot;sflckr&quot;]</span>
+<span class="n">images_interval</span> <span class="o">=</span>  <span class="mi">50</span><span class="c1">#@param {type:&quot;number&quot;}</span>
+<span class="n">init_image</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="c1">#@param {type:&quot;string&quot;}</span>
+<span class="n">target_images</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="c1">#@param {type:&quot;string&quot;}</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span><span class="c1">#@param {type:&quot;number&quot;}</span>
+<span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">200</span><span class="c1">#@param {type:&quot;number&quot;}</span>
+
+<span class="n">model_names</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;vqgan_imagenet_f16_16384&quot;</span><span class="p">:</span> <span class="s1">&#39;ImageNet 16384&#39;</span><span class="p">,</span><span class="s2">&quot;vqgan_imagenet_f16_1024&quot;</span><span class="p">:</span><span class="s2">&quot;ImageNet 1024&quot;</span><span class="p">,</span> <span class="s1">&#39;vqgan_openimages_f16_8192&#39;</span><span class="p">:</span><span class="s1">&#39;OpenImages 8912&#39;</span><span class="p">,</span>
+                 <span class="s2">&quot;wikiart_1024&quot;</span><span class="p">:</span><span class="s2">&quot;WikiArt 1024&quot;</span><span class="p">,</span> <span class="s2">&quot;wikiart_16384&quot;</span><span class="p">:</span><span class="s2">&quot;WikiArt 16384&quot;</span><span class="p">,</span> <span class="s2">&quot;coco&quot;</span><span class="p">:</span><span class="s2">&quot;COCO-Stuff&quot;</span><span class="p">,</span> <span class="s2">&quot;faceshq&quot;</span><span class="p">:</span><span class="s2">&quot;FacesHQ&quot;</span><span class="p">,</span> <span class="s2">&quot;sflckr&quot;</span><span class="p">:</span><span class="s2">&quot;S-FLCKR&quot;</span><span class="p">}</span>
+<span class="n">name_model</span> <span class="o">=</span> <span class="n">model_names</span><span class="p">[</span><span class="n">model</span><span class="p">]</span>     
+
+<span class="k">if</span> <span class="n">seed</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">if</span> <span class="n">init_image</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+    <span class="n">init_image</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">if</span> <span class="n">target_images</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">target_images</span><span class="p">:</span>
+    <span class="n">target_images</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">target_images</span> <span class="o">=</span> <span class="n">target_images</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+    <span class="n">target_images</span> <span class="o">=</span> <span class="p">[</span><span class="n">image</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">target_images</span><span class="p">]</span>
+
+<span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">phrase</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">texts</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)]</span>
+<span class="k">if</span> <span class="n">texts</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]:</span>
+    <span class="n">texts</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="n">args</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">(</span>
+    <span class="n">prompts</span><span class="o">=</span><span class="n">texts</span><span class="p">,</span>
+    <span class="n">image_prompts</span><span class="o">=</span><span class="n">target_images</span><span class="p">,</span>
+    <span class="n">noise_prompt_seeds</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">noise_prompt_weights</span><span class="o">=</span><span class="p">[],</span>
+    <span class="n">size</span><span class="o">=</span><span class="p">[</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">],</span>
+    <span class="n">init_image</span><span class="o">=</span><span class="n">init_image</span><span class="p">,</span>
+    <span class="n">init_weight</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+    <span class="n">clip_model</span><span class="o">=</span><span class="s1">&#39;ViT-B/32&#39;</span><span class="p">,</span>
+    <span class="n">vqgan_config</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">.yaml&#39;</span><span class="p">,</span>
+    <span class="n">vqgan_checkpoint</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">.ckpt&#39;</span><span class="p">,</span>
+    <span class="n">step_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">cutn</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">cut_pow</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
+    <span class="n">display_freq</span><span class="o">=</span><span class="n">images_interval</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cuda:0&#39;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using device:&#39;</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">texts</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using texts:&#39;</span><span class="p">,</span> <span class="n">texts</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">target_images</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using image prompts:&#39;</span><span class="p">,</span> <span class="n">target_images</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">seed</span><span class="p">()</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">seed</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Using seed:&#39;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">load_vqgan_model</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">vqgan_config</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">vqgan_checkpoint</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">perceptor</span> <span class="o">=</span> <span class="n">clip</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">clip_model</span><span class="p">,</span> <span class="n">jit</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="c1"># clock=deepcopy(perceptor.visual.positional_embedding.data)</span>
+<span class="c1"># perceptor.visual.positional_embedding.data = clock/clock.max()</span>
+<span class="c1"># perceptor.visual.positional_embedding.data=clamp_with_grad(clock,0,1)</span>
+
+<span class="n">cut_size</span> <span class="o">=</span> <span class="n">perceptor</span><span class="o">.</span><span class="n">visual</span><span class="o">.</span><span class="n">input_resolution</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">num_resolutions</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">make_cutouts</span> <span class="o">=</span> <span class="n">MakeCutouts</span><span class="p">(</span><span class="n">cut_size</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">cutn</span><span class="p">,</span> <span class="n">cut_pow</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">cut_pow</span><span class="p">)</span>
+
+<span class="n">toksX</span><span class="p">,</span> <span class="n">toksY</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">f</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="n">f</span>
+<span class="n">sideX</span><span class="p">,</span> <span class="n">sideY</span> <span class="o">=</span> <span class="n">toksX</span> <span class="o">*</span> <span class="n">f</span><span class="p">,</span> <span class="n">toksY</span> <span class="o">*</span> <span class="n">f</span>
+
+<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">vqgan_checkpoint</span> <span class="o">==</span> <span class="s1">&#39;vqgan_openimages_f16_8192.ckpt&#39;</span><span class="p">:</span>
+    <span class="n">e_dim</span> <span class="o">=</span> <span class="mi">256</span>
+    <span class="n">n_toks</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">n_embed</span>
+    <span class="n">z_min</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">embed</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">z_max</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">embed</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">e_dim</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">e_dim</span>
+    <span class="n">n_toks</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">n_e</span>
+    <span class="n">z_min</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">z_max</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+<span class="c1"># z_min = model.quantize.embedding.weight.min(dim=0).values[None, :, None, None]</span>
+<span class="c1"># z_max = model.quantize.embedding.weight.max(dim=0).values[None, :, None, None]</span>
+
+<span class="c1"># normalize_imagenet = transforms.Normalize(mean=[0.485, 0.456, 0.406],</span>
+<span class="c1">#                                            std=[0.229, 0.224, 0.225])</span>
+
+<span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">init_image</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s1">&#39;http&#39;</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">init_image</span><span class="p">:</span>
+      <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">urlopen</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">init_image</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">init_image</span><span class="p">)</span>
+    <span class="n">pil_image</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+    <span class="n">pil_image</span> <span class="o">=</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">sideX</span><span class="p">,</span> <span class="n">sideY</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">LANCZOS</span><span class="p">)</span>
+    <span class="n">pil_tensor</span> <span class="o">=</span> <span class="n">TF</span><span class="o">.</span><span class="n">to_tensor</span><span class="p">(</span><span class="n">pil_image</span><span class="p">)</span>
+    <span class="n">z</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">pil_tensor</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">one_hot</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">n_toks</span><span class="p">,</span> <span class="p">[</span><span class="n">toksY</span> <span class="o">*</span> <span class="n">toksX</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">),</span> <span class="n">n_toks</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="c1"># z = one_hot @ model.quantize.embedding.weight</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">vqgan_checkpoint</span> <span class="o">==</span> <span class="s1">&#39;vqgan_openimages_f16_8192.ckpt&#39;</span><span class="p">:</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">one_hot</span> <span class="o">@</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">embed</span><span class="o">.</span><span class="n">weight</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">one_hot</span> <span class="o">@</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">view</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">toksY</span><span class="p">,</span> <span class="n">toksX</span><span class="p">,</span> <span class="n">e_dim</span><span class="p">])</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> 
+    <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand_like</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span>
+<span class="n">z_orig</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+<span class="n">z</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">opt</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">([</span><span class="n">z</span><span class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">step_size</span><span class="p">)</span>
+
+<span class="n">normalize</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.48145466</span><span class="p">,</span> <span class="mf">0.4578275</span><span class="p">,</span> <span class="mf">0.40821073</span><span class="p">],</span>
+                                  <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.26862954</span><span class="p">,</span> <span class="mf">0.26130258</span><span class="p">,</span> <span class="mf">0.27577711</span><span class="p">])</span>
+
+
+
+<span class="n">pMs</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">prompts</span><span class="p">:</span>
+    <span class="n">txt</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">parse_prompt</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    <span class="n">embed</span> <span class="o">=</span> <span class="n">perceptor</span><span class="o">.</span><span class="n">encode_text</span><span class="p">(</span><span class="n">clip</span><span class="o">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="n">pMs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Prompt</span><span class="p">(</span><span class="n">embed</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">image_prompts</span><span class="p">:</span>
+    <span class="n">path</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="n">parse_prompt</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">pil_image</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">resize_image</span><span class="p">(</span><span class="n">pil_image</span><span class="p">,</span> <span class="p">(</span><span class="n">sideX</span><span class="p">,</span> <span class="n">sideY</span><span class="p">))</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">make_cutouts</span><span class="p">(</span><span class="n">TF</span><span class="o">.</span><span class="n">to_tensor</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+    <span class="n">embed</span> <span class="o">=</span> <span class="n">perceptor</span><span class="o">.</span><span class="n">encode_image</span><span class="p">(</span><span class="n">normalize</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="n">pMs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Prompt</span><span class="p">(</span><span class="n">embed</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">seed</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">noise_prompt_seeds</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">noise_prompt_weights</span><span class="p">):</span>
+    <span class="n">gen</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">embed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">perceptor</span><span class="o">.</span><span class="n">visual</span><span class="o">.</span><span class="n">output_dim</span><span class="p">])</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="n">gen</span><span class="p">)</span>
+    <span class="n">pMs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Prompt</span><span class="p">(</span><span class="n">embed</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">synth</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">vqgan_checkpoint</span> <span class="o">==</span> <span class="s1">&#39;vqgan_openimages_f16_8192.ckpt&#39;</span><span class="p">:</span>
+        <span class="n">z_q</span> <span class="o">=</span> <span class="n">vector_quantize</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">embed</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">z_q</span> <span class="o">=</span> <span class="n">vector_quantize</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">model</span><span class="o">.</span><span class="n">quantize</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span><span class="o">.</span><span class="n">movedim</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">clamp_with_grad</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">z_q</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">div</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">checkin</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">losses</span><span class="p">):</span>
+    <span class="n">losses_str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s1">g</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">loss</span> <span class="ow">in</span> <span class="n">losses</span><span class="p">)</span>
+    <span class="n">tqdm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;i: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">, loss: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s1">g</span><span class="si">}</span><span class="s1">, losses: </span><span class="si">{</span><span class="n">losses_str</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">synth</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">TF</span><span class="o">.</span><span class="n">to_pil_image</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;progress.png&#39;</span><span class="p">)</span>
+    <span class="n">display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">display</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="s1">&#39;progress.png&#39;</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">ascend_txt</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">i</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">synth</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+    <span class="n">iii</span> <span class="o">=</span> <span class="n">perceptor</span><span class="o">.</span><span class="n">encode_image</span><span class="p">(</span><span class="n">normalize</span><span class="p">(</span><span class="n">make_cutouts</span><span class="p">(</span><span class="n">out</span><span class="p">)))</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">init_weight</span><span class="p">:</span>
+        <span class="c1"># result.append(F.mse_loss(z, z_orig) * args.init_weight / 2)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">z_orig</span><span class="p">))</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="n">args</span><span class="o">.</span><span class="n">init_weight</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="n">pMs</span><span class="p">:</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prompt</span><span class="p">(</span><span class="n">iii</span><span class="p">))</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))[:,:,:]</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">imageio</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="s1">&#39;./steps/&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+    <span class="n">opt</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">lossAll</span> <span class="o">=</span> <span class="n">ascend_txt</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">display_freq</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">checkin</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">lossAll</span><span class="p">)</span>
+       
+    <span class="n">loss</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">lossAll</span><span class="p">)</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">opt</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">z</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">z_min</span><span class="p">)</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">z_max</span><span class="p">))</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tqdm</span><span class="p">()</span> <span class="k">as</span> <span class="n">pbar</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">train</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">max_iterations</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+<span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">init_frame</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1">#This is the frame where the video will start</span>
+<span class="n">last_frame</span> <span class="o">=</span> <span class="n">i</span> <span class="c1">#You can change i to the number of the last frame you want to generate. It will raise an error if that number of frames does not exist.</span>
+
+<span class="n">min_fps</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">max_fps</span> <span class="o">=</span> <span class="mi">60</span>
+
+<span class="n">total_frames</span> <span class="o">=</span> <span class="n">last_frame</span><span class="o">-</span><span class="n">init_frame</span>
+
+<span class="n">length</span> <span class="o">=</span> <span class="mi">15</span> <span class="c1">#Desired time of the video in seconds</span>
+
+<span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">tqdm</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Generating video...&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">init_frame</span><span class="p">,</span><span class="n">last_frame</span><span class="p">):</span> <span class="c1">#</span>
+    <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;./steps/&quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">))</span>
+
+<span class="c1">#fps = last_frame/10</span>
+<span class="n">fps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">total_frames</span><span class="o">/</span><span class="n">length</span><span class="p">,</span><span class="n">min_fps</span><span class="p">,</span><span class="n">max_fps</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;ffmpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;-y&#39;</span><span class="p">,</span> <span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;image2pipe&#39;</span><span class="p">,</span> <span class="s1">&#39;-vcodec&#39;</span><span class="p">,</span> <span class="s1">&#39;png&#39;</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span> <span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;-vcodec&#39;</span><span class="p">,</span> <span class="s1">&#39;libx264&#39;</span><span class="p">,</span> <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span> <span class="s1">&#39;-pix_fmt&#39;</span><span class="p">,</span> <span class="s1">&#39;yuv420p&#39;</span><span class="p">,</span> <span class="s1">&#39;-crf&#39;</span><span class="p">,</span> <span class="s1">&#39;17&#39;</span><span class="p">,</span> <span class="s1">&#39;-preset&#39;</span><span class="p">,</span> <span class="s1">&#39;veryslow&#39;</span><span class="p">,</span> <span class="s1">&#39;video.mp4&#39;</span><span class="p">],</span> <span class="n">stdin</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">frames</span><span class="p">):</span>
+    <span class="n">im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stdin</span><span class="p">,</span> <span class="s1">&#39;PNG&#39;</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="n">mp4</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;video.mp4&#39;</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">data_url</span> <span class="o">=</span> <span class="s2">&quot;data:video/mp4;base64,&quot;</span> <span class="o">+</span> <span class="n">b64encode</span><span class="p">(</span><span class="n">mp4</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+<span class="n">display</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&lt;video width=400 controls&gt;</span>
+<span class="s2">      &lt;source src=&quot;</span><span class="si">%s</span><span class="s2">&quot; type=&quot;video/mp4&quot;&gt;</span>
+<span class="s2">&lt;/video&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">data_url</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="joaorafaelm/notebook"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+</script>
+<a class="u-url" href="/notebook/vqgan/clip/2021/08/14/vqgan-and-clip.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/notebook/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/notebook/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/notebook/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/joaorafaelm" title="joaorafaelm"><svg class="svg-icon grey"><use xlink:href="/notebook/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
