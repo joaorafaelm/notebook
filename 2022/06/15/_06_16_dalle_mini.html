@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>DALLE mini - Inference pipeline | 📝</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="DALLE mini - Inference pipeline" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://joaorafaelm.github.io/notebook/2022/06/15/_06_16_dalle_mini.html" />
+<meta property="og:url" content="https://joaorafaelm.github.io/notebook/2022/06/15/_06_16_dalle_mini.html" />
+<meta property="og:site_name" content="📝" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-06-15T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://joaorafaelm.github.io/notebook/2022/06/15/_06_16_dalle_mini.html","@type":"BlogPosting","headline":"DALLE mini - Inference pipeline","dateModified":"2022-06-15T00:00:00-05:00","datePublished":"2022-06-15T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://joaorafaelm.github.io/notebook/2022/06/15/_06_16_dalle_mini.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/notebook/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://joaorafaelm.github.io/notebook/feed.xml" title="📝" /><!-- the google_analytics_id gets auto inserted from the config file -->
+
+
+
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-104187041-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-104187041-1');
+</script>
+
+
+<link rel="shortcut icon" type="image/x-icon" href="/notebook/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/notebook/">📝</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/notebook/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">DALLE mini - Inference pipeline</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-06-15T00:00:00-05:00" itemprop="datePublished">
+        Jun 15, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span>
+
+    </p>
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-left badges">
+          <div class="px-2">
+
+    <a href="https://github.com/joaorafaelm/notebook/tree/master/_notebooks/2022_06_16_dalle_mini.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/notebook/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/joaorafaelm/notebook/blob/master/_notebooks/2022_06_16_dalle_mini.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/notebook/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2022_06_16_dalle_mini.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="https://colab.research.google.com/github/joaorafaelm/notebook/blob/master/_notebooks/2022_06_16_dalle_mini.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" /></a></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This notebook illustrates <a href="https://github.com/borisdayma/dalle-mini">DALL·E mini</a> inference pipeline.</p>
+<p>Just want to play? Use directly <a href="https://huggingface.co/spaces/dalle-mini/dalle-mini">DALL·E mini app</a>.</p>
+<p>For more understanding of the model, refer to <a href="https://wandb.ai/dalle-mini/dalle-mini/reports/DALL-E-mini--Vmlldzo4NjIxODA">the report</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="&#128736;&#65039;-Installation-and-set-up">&#128736;&#65039; Installation and set-up<a class="anchor-link" href="#&#128736;&#65039;-Installation-and-set-up"> </a></h2>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>pip install -q dalle-mini
+<span class="o">!</span>pip install -q git+https://github.com/patil-suraj/vqgan-jax.git
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We load required models:</p>
+<ul>
+<li>DALL·E mini for text to encoded images</li>
+<li>VQGAN for decoding images</li>
+<li>CLIP for scoring predictions</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># dalle-mega</span>
+<span class="n">DALLE_MODEL</span> <span class="o">=</span> <span class="s2">&quot;dalle-mini/dalle-mini/mega-1-fp16:latest&quot;</span>  <span class="c1"># can be wandb artifact or 🤗 Hub or local folder or google bucket</span>
+<span class="n">DALLE_COMMIT_ID</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># if the notebook crashes too often you can use dalle-mini instead by uncommenting below line</span>
+<span class="c1"># DALLE_MODEL = &quot;dalle-mini/dalle-mini/mini-1:v0&quot;</span>
+
+<span class="c1"># VQGAN model</span>
+<span class="n">VQGAN_REPO</span> <span class="o">=</span> <span class="s2">&quot;dalle-mini/vqgan_imagenet_f16_16384&quot;</span>
+<span class="n">VQGAN_COMMIT_ID</span> <span class="o">=</span> <span class="s2">&quot;e93a26e7707683d349bf5d5c41c5b0ef69b677a9&quot;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">jax</span>
+<span class="kn">import</span> <span class="nn">jax.numpy</span> <span class="k">as</span> <span class="nn">jnp</span>
+
+<span class="c1"># check how many devices are available</span>
+<span class="n">jax</span><span class="o">.</span><span class="n">local_device_count</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>1</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">dalle_mini</span> <span class="kn">import</span> <span class="n">DalleBart</span><span class="p">,</span> <span class="n">DalleBartProcessor</span>
+<span class="kn">from</span> <span class="nn">vqgan_jax.modeling_flax_vqgan</span> <span class="kn">import</span> <span class="n">VQModel</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">CLIPProcessor</span><span class="p">,</span> <span class="n">FlaxCLIPModel</span>
+
+<span class="c1"># Load dalle-mini</span>
+<span class="n">model</span><span class="p">,</span> <span class="n">params</span> <span class="o">=</span> <span class="n">DalleBart</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="n">DALLE_MODEL</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="n">DALLE_COMMIT_ID</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="n">_do_init</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="c1"># Load VQGAN</span>
+<span class="n">vqgan</span><span class="p">,</span> <span class="n">vqgan_params</span> <span class="o">=</span> <span class="n">VQModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="n">VQGAN_REPO</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="n">VQGAN_COMMIT_ID</span><span class="p">,</span> <span class="n">_do_init</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre><span class="ansi-blue-intense-fg ansi-bold">wandb</span>: Downloading large artifact mega-1-fp16:latest, 4938.53MB. 7 files... Done. 0:0:35.0
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Model parameters are replicated on each device for faster inference.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">flax.jax_utils</span> <span class="kn">import</span> <span class="n">replicate</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="n">replicate</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="n">vqgan_params</span> <span class="o">=</span> <span class="n">replicate</span><span class="p">(</span><span class="n">vqgan_params</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Model functions are compiled and parallelized to take advantage of multiple devices.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="c1"># model inference</span>
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">pmap</span><span class="p">,</span> <span class="n">axis_name</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span> <span class="n">static_broadcasted_argnums</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">p_generate</span><span class="p">(</span>
+    <span class="n">tokenized_prompt</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">top_k</span><span class="p">,</span> <span class="n">top_p</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">condition_scale</span>
+<span class="p">):</span>
+    <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+        <span class="o">**</span><span class="n">tokenized_prompt</span><span class="p">,</span>
+        <span class="n">prng_key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+        <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+        <span class="n">top_k</span><span class="o">=</span><span class="n">top_k</span><span class="p">,</span>
+        <span class="n">top_p</span><span class="o">=</span><span class="n">top_p</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+        <span class="n">condition_scale</span><span class="o">=</span><span class="n">condition_scale</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># decode image</span>
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">pmap</span><span class="p">,</span> <span class="n">axis_name</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">p_decode</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">vqgan</span><span class="o">.</span><span class="n">decode_code</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Keys are passed to the model on each device to generate unique inference per device.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="c1"># create a random key</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">PRNGKey</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="&#128397;-Text-Prompt">&#128397; Text Prompt<a class="anchor-link" href="#&#128397;-Text-Prompt"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Our model requires processing prompts.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">dalle_mini</span> <span class="kn">import</span> <span class="n">DalleBartProcessor</span>
+
+<span class="n">processor</span> <span class="o">=</span> <span class="n">DalleBartProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">DALLE_MODEL</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="n">DALLE_COMMIT_ID</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's define some text prompts.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sunset over a lake in the mountains&quot;</span><span class="p">,</span> <span class="s2">&quot;the Eiffel tower landing on the moon&quot;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Note: we could use the same prompt multiple times for faster inference.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tokenized_prompts</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">prompts</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally we replicate the prompts onto each device.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tokenized_prompt</span> <span class="o">=</span> <span class="n">replicate</span><span class="p">(</span><span class="n">tokenized_prompts</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="&#127912;-Generate-images">&#127912; Generate images<a class="anchor-link" href="#&#127912;-Generate-images"> </a></h2><p>We generate images using dalle-mini model and decode them with the VQGAN.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_predictions</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># We can customize generation parameters (see https://huggingface.co/blog/how-to-generate)</span>
+<span class="n">gen_top_k</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">gen_top_p</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">temperature</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">cond_scale</span> <span class="o">=</span> <span class="mf">10.0</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">flax.training.common_utils</span> <span class="kn">import</span> <span class="n">shard_prng_key</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">tqdm.notebook</span> <span class="kn">import</span> <span class="n">trange</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompts: </span><span class="si">{</span><span class="n">prompts</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># generate images</span>
+<span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">n_predictions</span> <span class="o">//</span> <span class="n">jax</span><span class="o">.</span><span class="n">device_count</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)):</span>
+    <span class="c1"># get a new key</span>
+    <span class="n">key</span><span class="p">,</span> <span class="n">subkey</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="c1"># generate images</span>
+    <span class="n">encoded_images</span> <span class="o">=</span> <span class="n">p_generate</span><span class="p">(</span>
+        <span class="n">tokenized_prompt</span><span class="p">,</span>
+        <span class="n">shard_prng_key</span><span class="p">(</span><span class="n">subkey</span><span class="p">),</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">gen_top_k</span><span class="p">,</span>
+        <span class="n">gen_top_p</span><span class="p">,</span>
+        <span class="n">temperature</span><span class="p">,</span>
+        <span class="n">cond_scale</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># remove BOS</span>
+    <span class="n">encoded_images</span> <span class="o">=</span> <span class="n">encoded_images</span><span class="o">.</span><span class="n">sequences</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span>
+    <span class="c1"># decode images</span>
+    <span class="n">decoded_images</span> <span class="o">=</span> <span class="n">p_decode</span><span class="p">(</span><span class="n">encoded_images</span><span class="p">,</span> <span class="n">vqgan_params</span><span class="p">)</span>
+    <span class="n">decoded_images</span> <span class="o">=</span> <span class="n">decoded_images</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">decoded_img</span> <span class="ow">in</span> <span class="n">decoded_images</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">decoded_img</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">))</span>
+        <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="&#127941;-Optional:-Rank-images-by-CLIP-score">&#127941; Optional: Rank images by CLIP score<a class="anchor-link" href="#&#127941;-Optional:-Rank-images-by-CLIP-score"> </a></h2><p>We can rank images according to CLIP.</p>
+<p><strong>Note: your session may crash if you don't have a subscription to Colab Pro.</strong></p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">CLIP_REPO</span> <span class="o">=</span> <span class="s2">&quot;openai/clip-vit-base-patch32&quot;</span>
+<span class="n">CLIP_COMMIT_ID</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># Load CLIP</span>
+<span class="n">clip</span><span class="p">,</span> <span class="n">clip_params</span> <span class="o">=</span> <span class="n">FlaxCLIPModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="n">CLIP_REPO</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="n">CLIP_COMMIT_ID</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float16</span><span class="p">,</span> <span class="n">_do_init</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+<span class="n">clip_processor</span> <span class="o">=</span> <span class="n">CLIPProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">CLIP_REPO</span><span class="p">,</span> <span class="n">revision</span><span class="o">=</span><span class="n">CLIP_COMMIT_ID</span><span class="p">)</span>
+<span class="n">clip_params</span> <span class="o">=</span> <span class="n">replicate</span><span class="p">(</span><span class="n">clip_params</span><span class="p">)</span>
+
+<span class="c1"># score images</span>
+<span class="nd">@partial</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">pmap</span><span class="p">,</span> <span class="n">axis_name</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">p_clip</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="n">logits</span> <span class="o">=</span> <span class="n">clip</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">logits_per_image</span>
+    <span class="k">return</span> <span class="n">logits</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">flax.training.common_utils</span> <span class="kn">import</span> <span class="n">shard</span>
+
+<span class="c1"># get clip scores</span>
+<span class="n">clip_inputs</span> <span class="o">=</span> <span class="n">clip_processor</span><span class="p">(</span>
+    <span class="n">text</span><span class="o">=</span><span class="n">prompts</span> <span class="o">*</span> <span class="n">jax</span><span class="o">.</span><span class="n">device_count</span><span class="p">(),</span>
+    <span class="n">images</span><span class="o">=</span><span class="n">images</span><span class="p">,</span>
+    <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;np&quot;</span><span class="p">,</span>
+    <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span>
+    <span class="n">max_length</span><span class="o">=</span><span class="mi">77</span><span class="p">,</span>
+    <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">data</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">p_clip</span><span class="p">(</span><span class="n">shard</span><span class="p">(</span><span class="n">clip_inputs</span><span class="p">),</span> <span class="n">clip_params</span><span class="p">)</span>
+
+<span class="c1"># organize scores per prompt</span>
+<span class="n">p</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prompts</span><span class="p">)</span>
+<span class="n">logits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">logits</span><span class="p">[:,</span> <span class="n">i</span><span class="p">::</span><span class="n">p</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">)])</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+<span class="c1">#logits = rearrange(logits, &#39;1 b p -&gt; p b&#39;)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">logits</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's now display images ranked by CLIP score.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prompts</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt: </span><span class="si">{</span><span class="n">prompt</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">logits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">images</span><span class="p">[</span><span class="n">idx</span><span class="o">*</span><span class="n">p</span><span class="o">+</span><span class="n">i</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Score: </span><span class="si">{</span><span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">logits</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">idx</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">jnp</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="joaorafaelm/notebook"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-dark"
+        crossorigin="anonymous"
+        async>
+</script>
+<a class="u-url" href="/notebook/2022/06/15/_06_16_dalle_mini.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/notebook/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/notebook/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/notebook/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/joaorafaelm" target="_blank" title="joaorafaelm"><svg class="svg-icon grey"><use xlink:href="/notebook/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
